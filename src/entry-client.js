@@ -1,4 +1,5 @@
 import { createApp } from "./main";
+import './plugins-client/vue-toast';
 
 const { app, router, store } = createApp();
 
