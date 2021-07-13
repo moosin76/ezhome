@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" :max-width="options.width">
+  <v-dialog v-model="dialog" :max-width="options.width" persistent>
     <v-card>
       <v-toolbar v-if="title" color="primary" dark>
         <v-toolbar-title>{{ title }}</v-toolbar-title>
