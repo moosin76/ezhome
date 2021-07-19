@@ -10,6 +10,5 @@ if(window.__INITIAL_STATE__) {
 }
 
 router.onReady(()=>{
-	console.log('entry-client.js onReady');
 	app.$mount('#app');
 })

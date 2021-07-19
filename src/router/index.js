@@ -28,12 +28,12 @@ export function createRouter() {
 	});
 
 	router.beforeEach((to, from, next) => {
-		console.log('router.js beforeEach');
+	
 		next();
 	});
 
 	router.afterEach((to, from)=> {
-		console.log('router.js afterEach');
+	
 	})
 
 	return router;
