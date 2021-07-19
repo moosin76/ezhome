@@ -25,6 +25,7 @@ const renderer = createBundleRenderer(serverBundle, {
 });
 
 app.get('*', (req, res) => {
+	console.log('server.js * router');
 	const ctx = {
 		url : req.url,
 		title : 'Vue SSR App',

@@ -26,6 +26,16 @@ export function createRouter() {
 		base: process.env.BASE_URL,
 		routes
 	});
+
+	router.beforeEach((to, from, next) => {
+		console.log('router.js beforeEach');
+		next();
+	});
+
+	router.afterEach((to, from)=> {
+		console.log('router.js afterEach');
+	})
+
 	return router;
 }
 
