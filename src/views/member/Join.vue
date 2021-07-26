@@ -5,7 +5,7 @@
         <v-toolbar-title>회원가입</v-toolbar-title>
       </v-toolbar>
       <v-card-text> 
-				<sing-up-form/> 
+				<sing-up-form :cbCheckId="checkId"/> 
 			</v-card-text>
     </v-card>
   </div>
@@ -16,6 +16,12 @@ import SingUpForm from "../../components/auth/SingUpForm.vue";
 export default {
   components: { SingUpForm },
   name: "Join",
+	methods : {
+		async checkId(id) {
+			console.log(id) 
+			return {cnt : 0};
+		}
+	}
 };
 </script>
 
