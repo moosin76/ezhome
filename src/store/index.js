@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-
+import modules from "./modules";
 Vue.use(Vuex)
 
 export function createStore() {
@@ -68,8 +68,7 @@ export function createStore() {
 		},
 		actions: {
 		},
-		modules: {
-		}
+		modules,
 	});
 
 	return store;

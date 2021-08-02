@@ -8,6 +8,15 @@ const lib = {
 			result[key] = lib.deepCopy(obj[key]);
 		}
 		return result;
+	},
+	async modelCall(fn, ...args) {
+		try {
+			const result = await fn(...args);
+			return result;
+		} catch(e) {
+			console.trace(e);
+			return { err : e.message };
+		}
 	}
 }
 
