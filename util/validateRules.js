@@ -86,6 +86,20 @@ const rules = {
 		}
 		arr.push(rules.pattern(opt));
 		return arr;
+	},
+	phone(options) {
+		const defaultOptions = {
+			label : '전화번호',
+			required : true,
+			pattern : /^(\d{2,3}-)?\d{3,4}-\d{4}$/
+		};
+		const opt = Object.assign(defaultOptions, options);
+		const arr = [];
+		if(opt.required) {
+			arr.push(rules.require(opt));
+		}
+		arr.push(rules.pattern(opt));
+		return arr;
 	}
 };
 

@@ -55,6 +55,13 @@
       :rules="[rules.require({ label: '성별' })]"
     />
 
+    <input-phone
+      v-model="form.mb_phone"
+      label="전화번호"
+      prepend-icon="mdi-phone"
+			:rules="rules.phone()"
+    />
+
     <v-btn type="submit" block color="primary">회원가입</v-btn>
   </v-form>
 </template>
@@ -64,10 +71,17 @@ import validateRules from "../../../util/validateRules";
 import InputDate from "../InputForms/InputDate.vue";
 import InputDuplicateCheck from "../InputForms/InputDuplicateCheck.vue";
 import InputPassword from "../InputForms/InputPassword.vue";
+import InputPhone from "../InputForms/InputPhone.vue";
 import InputRadio from "../InputForms/InputRadio.vue";
 
 export default {
-  components: { InputDuplicateCheck, InputPassword, InputDate, InputRadio },
+  components: {
+    InputDuplicateCheck,
+    InputPassword,
+    InputDate,
+    InputRadio,
+    InputPhone,
+  },
   name: "SignUpForm",
   props: {
     cbCheckId: {
@@ -87,7 +101,7 @@ export default {
         mb_password: "abcd1234",
         mb_name: "테스트",
         mb_birth: "2000-10-01",
-        mb_gender: "",
+        mb_gender: "M",
         mb_email: "test@test.com",
         mb_phone: "",
         mb_zip: "",
