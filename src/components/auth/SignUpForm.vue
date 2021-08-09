@@ -62,6 +62,12 @@
 			:rules="rules.phone()"
     />
 
+		<input-post 
+			:zipcode.sync="form.mb_zip"
+			:addr1.sync="form.mb_addr1"
+			:addr2.sync="form.mb_addr2"
+		/>
+
     <v-btn type="submit" block color="primary">회원가입</v-btn>
   </v-form>
 </template>
@@ -72,6 +78,7 @@ import InputDate from "../InputForms/InputDate.vue";
 import InputDuplicateCheck from "../InputForms/InputDuplicateCheck.vue";
 import InputPassword from "../InputForms/InputPassword.vue";
 import InputPhone from "../InputForms/InputPhone.vue";
+import InputPost from '../InputForms/InputPost.vue';
 import InputRadio from "../InputForms/InputRadio.vue";
 
 export default {
@@ -81,6 +88,7 @@ export default {
     InputDate,
     InputRadio,
     InputPhone,
+    InputPost,
   },
   name: "SignUpForm",
   props: {
@@ -103,10 +111,10 @@ export default {
         mb_birth: "2000-10-01",
         mb_gender: "M",
         mb_email: "test@test.com",
-        mb_phone: "",
-        mb_zip: "",
-        mb_addr1: "",
-        mb_addr2: "",
+        mb_phone: "010-1111-1111",
+        mb_zip: "06302",
+        mb_addr1: "서울 강남구 양재천로 163 (도곡동, 바디프랜드 도곡타워)",
+        mb_addr2: "3층",
       },
       confirmPw: "abcd1234",
       genderItems: [
