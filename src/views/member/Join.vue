@@ -13,7 +13,7 @@
 
 <script>
 import { mapActions } from 'vuex';
-import SingUpForm from "../../components/auth/SingUpForm.vue";
+import SingUpForm from "../../components/auth/SignUpForm.vue";
 export default {
   components: { SingUpForm },
   name: "Join",

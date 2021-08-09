@@ -72,6 +72,20 @@ const rules = {
 		arr.push(rules.min(opt));
 		arr.push(rules.pattern(opt));
 		return arr;
+	},
+	date(options) {
+		const defaultOptions = {
+			label : '날자',
+			required : true,
+			pattern : /^\d{4}-\d{2}-\d{2}$/
+		};
+		const opt = Object.assign(defaultOptions, options);
+		const arr = [];
+		if(opt.required) {
+			arr.push(rules.require(opt));
+		}
+		arr.push(rules.pattern(opt));
+		return arr;
 	}
 };
 
