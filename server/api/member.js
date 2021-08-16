@@ -8,9 +8,14 @@ router.get('/duplicateCheck/:field/:value', async (req, res) => {
 	res.json(result);
 });
 
+// 회원가입
 router.post('/', async (req, res) =>{
 	const result = await modelCall(memberModel.createMember, req);
 	res.json(result);
 })
 
+// 로그인
+router.post('/loginLocal', async(req, res)=> {
+	res.json(req.body);
+});
 module.exports = router;
