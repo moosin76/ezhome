@@ -1,9 +1,11 @@
 const db = require('../../plugins/mysql');
+const jwt = require('../../plugins/jwt');
 const sqlHelper = require('../../../util/sqlHelper');
 const TABLE = require('../../../util/TABLE');
 const { LV } = require('../../../util/level');
 const moment = require('../../../util/moment');
 const { getIp } = require('../../../util/lib');
+
 
 async function getDefaultMemberLevel() {
 	const sql = sqlHelper.SelectSimple(
@@ -27,7 +29,6 @@ const memberModel = {
 		return row;
 	},
 	async createMember(req) {
-		// console.log('createMember', req.body);
 		const at = moment().format('LT');
 		const ip = getIp(req);
 
@@ -40,9 +41,11 @@ const memberModel = {
 			mb_update_ip : ip,
 		}
 
-		// 비밀번호 암호화
-		console.log(payload);
-		return payload;
+		payload.mb_password = jwt.generatePassword(payload.mb_password);
+		const sql = sqlHelper.Insert(TABLE.MEMBER, payload);
+		const [row] = await db.execute(sql.query, sql.values);
+				
+		return row.affectedRows == 1;
 	}
 };
 
