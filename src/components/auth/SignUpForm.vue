@@ -47,6 +47,13 @@
       :rules="rules.date({ label: '생년월일' })"
     />
 
+		<v-file-input 
+			label="회원이미지"
+			v-model="form.mb_image"
+			prepend-icon="mdi-account-box"
+			accept="image/jpg,image/png"
+		/>
+
     <input-radio
       v-model="form.mb_gender"
       :items="genderItems"
@@ -116,6 +123,7 @@ export default {
         mb_zip: "06302",
         mb_addr1: "서울 강남구 양재천로 163 (도곡동, 바디프랜드 도곡타워)",
         mb_addr2: "3층",
+				mb_image : null,
       },
       confirmPw: "abcd1234",
       genderItems: [
@@ -135,7 +143,13 @@ export default {
       if (!this.$refs.id.validate()) return;
       if (!this.$refs.email.validate()) return;
 
-      this.$emit('onSave', this.form);
+      // this.$emit('onSave', this.form);
+			const formData = new FormData();
+			const keys = Object.keys(this.form);
+			for(const key of keys) {
+				formData.append(key, this.form[key]);
+			}
+			this.$emit('onSave', formData);
     },
   },
 };
