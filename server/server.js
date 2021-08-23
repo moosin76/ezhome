@@ -9,6 +9,15 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+app.use((req, res, next)=> {
+	if(req.path.indexOf('favicon.ico') > -1) {
+		const favicon = fs.readFileSync(path.join(__dirname, '../dist/favicon.ico'));
+		res.status(200).end(favicon);
+		return;
+	}
+	next();
+});
+
 // 파서
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -24,6 +33,10 @@ fs.mkdirSync(MEMBER_PHOTO_PATH, {recursive : true});
 // Passport
 const passport = require('./plugins/passport');
 passport(app);
+
+// 이미지 업로드
+const thumbnail = require('./plugins/thumbnail');
+app.use('/upload/:_path', thumbnail(path.join(__dirname, './upload')));
 
 // 정적 폴더
 app.use(express.static(path.join(__dirname, "../dist")));

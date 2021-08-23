@@ -4,7 +4,11 @@ export const state = () => ({
 	member : null,
 });
 
-export const mutations = {};
+export const mutations = {
+	SET_MEMBER(state, member) {
+		state.member = member;
+	}
+};
 export const getters = {};
 export const actions = {
 	async duplicateCheck(ctx, {field, value}) {
@@ -20,6 +24,9 @@ export const actions = {
 	async signInLocal({commit}, form) {
 		const { $axios } = Vue.prototype;
 		const data = await $axios.post('/api/member/loginLocal', form);
+		if(data) {
+			commit('SET_MEMBER', data.member);
+		}
 		return data;
 	},
 };
