@@ -9,6 +9,7 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+// 파비콘
 app.use((req, res, next)=> {
 	if(req.path.indexOf('favicon.ico') > -1) {
 		const favicon = fs.readFileSync(path.join(__dirname, '../dist/favicon.ico'));
@@ -61,10 +62,13 @@ const renderer = createBundleRenderer(serverBundle, {
 });
 
 app.get('*', (req, res) => {
+	// console.log(req.cookies, req.user);
 	const ctx = {
 		url: req.url,
 		title: 'Vue SSR App',
 		metas: `<!-- inject more metas -->`,
+		token : req.cookies.token || null,
+		member : req.user || null,
 	};
 
 	const stream = renderer.renderToStream(ctx);

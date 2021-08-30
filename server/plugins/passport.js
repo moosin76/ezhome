@@ -21,5 +21,20 @@ module.exports = (app) => {
 				return done(null, null, '아이디 또는 비밀번호가 올바르지 않습니다.');
 			}
 		}
-	))
+	));
+
+	// 인증
+	app.use(async (req, res, next)=> {
+		const token = req.cookies.token;
+		if(!token) return next();
+		const { mb_id } = jwt.vetify(token);
+		if(!mb_id) return next();
+		try {
+			const member = await memberModel.getMemberBy({mb_id});
+			req.login(member,{session : false}, (err)=>{});	
+		} catch(e) {	
+			console.log(e);
+		}
+		next();
+	});
 }
