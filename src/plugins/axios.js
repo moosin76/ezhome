@@ -64,23 +64,6 @@ _axios.interceptors.response.use(
 	}
 );
 
-const Plugin = {};
-Plugin.install = function (Vue, options) {
-	Vue.axios = _axios;
-	Object.defineProperties(Vue.prototype, {
-		axios: {
-			get() {
-				return _axios;
-			}
-		},
-		$axios: {
-			get() {
-				return _axios;
-			}
-		},
-	});
-};
-
-Vue.use(Plugin)
+Vue.prototype.$axios = _axios;
 
 export default _axios;

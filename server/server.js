@@ -9,6 +9,15 @@ const app = express();
 const port = process.env.VUE_APP_SERVER_PORT || 3000;
 const webServer = http.createServer(app);
 
+let isDiableKeepAlive = false;
+app.use((req, res, next)=> {
+	if(isDiableKeepAlive) {
+		console.log('Keep Alive', isDiableKeepAlive);
+		res.set('Connection', 'close');
+	}
+	next();
+})
+
 // 파비콘
 app.use((req, res, next)=> {
 	if(req.path.indexOf('favicon.ico') > -1) {
@@ -55,14 +64,16 @@ const template = fs.readFileSync(path.join(__dirname, 'index.template.html'), 'u
 const serverBundle = require(path.join(__dirname, "../dist/vue-ssr-server-bundle.json"));
 const clientManifest = require(path.join(__dirname, "../dist/vue-ssr-client-manifest.json"));
 
-const renderer = createBundleRenderer(serverBundle, {
-	runInNewContext: false,
-	template,
-	clientManifest,
-});
+
 
 app.get('*', (req, res) => {
 	// console.log(req.cookies, req.user);
+	const renderer = createBundleRenderer(serverBundle, {
+		runInNewContext: false,
+		template,
+		clientManifest,
+	});
+	
 	const ctx = {
 		url: req.url,
 		title: 'Vue SSR App',
@@ -74,11 +85,26 @@ app.get('*', (req, res) => {
 	const stream = renderer.renderToStream(ctx);
 
 	stream.on('end', () => {
-		console.log('스트림 렌더 종료')
+		const memSize = Object.entries(process.memoryUsage())[0][1];
+		console.log('스트림 렌더 종료', (memSize/1024/1024).toFixed(4));
+		if(process.platform == 'linux') {
+			if(memSize > 150000000) {
+				process.emit('SIGINT'); 
+			}
+		}
 	}).pipe(res);
 });
 
 // 서버 응답
 webServer.listen(port, () => {
+	process.send('ready');
 	console.log(`http://localhost:${port}`);
+});
+
+process.on('SIGINT', function(){
+	isDiableKeepAlive = true;
+	webServer.close(function(){
+		console.log('server closed');
+		process.exit(0);
+	})
 });

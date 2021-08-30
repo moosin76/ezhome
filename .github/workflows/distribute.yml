@@ -20,5 +20,4 @@ jobs:
             cd /home/ubuntu/ezhome
             sudo git pull
             sudo yarn
-            sudo yarn build
             pm2 reload all
