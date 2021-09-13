@@ -1,5 +1,8 @@
+const fs = require('fs');
 const db = require('../../plugins/mysql');
 const jwt = require('../../plugins/jwt');
+const sendMailer = require('../../plugins/sendMailer');
+
 const sqlHelper = require('../../../util/sqlHelper');
 const TABLE = require('../../../util/TABLE');
 const { LV } = require('../../../util/level');
@@ -95,6 +98,50 @@ const memberModel = {
 		const [[row]] = await db.execute(sql.query, sql.values);
 		if(!row) throw new Error('일치하는 회원이 없습니다.');
 		return row;
+	},
+	async findPw(req) {
+		// 검색을 해서 일치 하는 회원이 있는 보고
+		const data = req.query;
+		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['mb_name']);
+		const [[member]] = await db.execute(sql.query, sql.values);
+		if(!member) throw new Error('일치하는 회원정보가 없습니다.');
+
+		// sm_to, sm_type, sm_hash, sm_subject, sm_content, sm_create_at, sm_expire_at
+		// 있으면 토큰 하나 발급
+		const sm_hash = jwt.getRandToken(64);
+		const title = 'ezCode'; // 나중에 사이트 설정갑에서 가지고 오자
+		const sm_subject = `${title} 비밀번호 찾기`;
+		const sm_create_at = moment().format('LT');
+		const expire_at = moment().add('30', 'm');
+
+		const hostName = req.headers['x-forwarded-host'] || req.headers.host;
+		const baseUrl = `${req.protocol}://${hostName}/modifyPassword/`;
+
+		let sm_content = fs.readFileSync(__dirname + '/findPwForm.html').toString();
+		sm_content = sm_content.replace('{{name}}', member.mb_name);
+		sm_content = sm_content.replace('{{time}}', expire_at.format('LLLL') + '분');
+		sm_content = sm_content.replace('{{link}}', baseUrl + sm_hash);
+
+		const sm = {
+			sm_to : data.mb_email,
+			sm_type : 1,
+			sm_hash,
+			sm_subject,
+			sm_content,
+			sm_create_at,
+			sm_expire_at : expire_at.format('LT'),
+		}
+		
+		try {
+			await sendMailer(`${title} 관리자`, data.mb_email, sm_subject, sm_content);
+			const smSql = sqlHelper.Insert(TABLE.SEND_MAIL, sm);
+			await db.execute(smSql.query, smSql.values);
+		} catch(e) {
+			console.log(e);
+			return {err : `email 발송에 필패 하였습니다.\n관리자에게 문의 주세요.`}
+		}
+		
+		return member;
 	}
 };
 

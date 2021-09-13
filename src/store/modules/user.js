@@ -56,5 +56,11 @@ export const actions = {
 		const query = qs.stringify(form);
 		const data = await $axios.get(`/api/member/findId?${query}`);
 		return data;
+	},
+	async findPwLocal(ctx, form) {
+		const {$axios} = Vue.prototype;
+		const query = qs.stringify(form);
+		const data = await $axios.get(`/api/member/findPw?${query}`);
+		return data;
 	}
 };

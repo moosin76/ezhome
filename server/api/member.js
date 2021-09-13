@@ -60,4 +60,10 @@ router.get('/findId', async(req, res)=>{
 	res.json(result);
 });
 
+// 비밀번호 찾기
+router.get('/findPw', async(req, res)=> {
+	const result = await modelCall(memberModel.findPw, req);
+	res.json(result);
+})
+
 module.exports = router;

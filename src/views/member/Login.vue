@@ -17,7 +17,9 @@
 					<v-tab-item>
 						<find-id-form @save="findId" :isLoading="isLoading"/>
 					</v-tab-item>
-					<v-tab-item>{{tabs}} 비밀번호</v-tab-item>
+					<v-tab-item>
+						<find-pw-form @save="findPw" :isLoading="isLoading"/>
+					</v-tab-item>
 				</v-tabs-items>
 			</v-card-text>
 			<v-card-text class="mt-n4">
@@ -30,10 +32,11 @@
 <script>
 import { mapActions } from 'vuex';
 import FindIdForm from '../../components/auth/FindIdForm.vue';
+import FindPwForm from '../../components/auth/FindPwForm.vue';
 import SignInForm from '../../components/auth/SignInForm.vue';
 import SiteTitle from "../../components/layout/SiteTitle.vue";
 export default {
-  components: { SiteTitle, SignInForm, FindIdForm },
+  components: { SiteTitle, SignInForm, FindIdForm, FindPwForm },
   name: "Login",
   data() {
     return {
@@ -43,7 +46,7 @@ export default {
     };
   },
 	methods : {
-		...mapActions('user', ['signInLocal', 'findIdLocal']),
+		...mapActions('user', ['signInLocal', 'findIdLocal', 'findPwLocal']),
 		async loginLocal(form) {
 			this.isLoading = true;
 			const data = await this.signInLocal(form);
@@ -62,6 +65,18 @@ export default {
 				await this.$ezNotify.alert(
 					`<span style="font-size:1.5em">회원 아이디 : [ <b>${data.mb_id}</b> ]</span>`,
 					'아이디 찾기 결과'
+				);
+				this.tabs = 0;
+			}
+		},
+		async findPw(form) {
+			this.isLoading = true;
+			const data = await this.findPwLocal(form);
+			this.isLoading = false;
+			if(data) {
+				await this.$ezNotify.alert(
+					`${data.mb_name}님<br><b>${form.mb_email}</b>로 이메일 발송하였습니다.`,
+					'이메일 발송 성공'
 				);
 				this.tabs = 0;
 			}
