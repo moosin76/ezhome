@@ -23,6 +23,7 @@
     "mysql2": "^2.2.5",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "qs": "^6.10.1",
     "rand-token": "^1.0.1",
     "roboto-fontface": "*",
     "sharp": "^0.29.0",

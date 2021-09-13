@@ -1,4 +1,5 @@
 import Vue from "vue";
+import qs from 'qs';
 
 export const state = () => ({
 	member : null,
@@ -49,5 +50,11 @@ export const actions = {
 		commit('SET_MEMBER', null);
 		commit('SET_TOKEN', null);
 		return mb_name;
+	},
+	async findIdLocal(ctx, form) {
+		const {$axios} = Vue.prototype;
+		const query = qs.stringify(form);
+		const data = await $axios.get(`/api/member/findId?${query}`);
+		return data;
 	}
 };

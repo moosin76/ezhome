@@ -64,8 +64,6 @@ const template = fs.readFileSync(path.join(__dirname, 'index.template.html'), 'u
 const serverBundle = require(path.join(__dirname, "../dist/vue-ssr-server-bundle.json"));
 const clientManifest = require(path.join(__dirname, "../dist/vue-ssr-client-manifest.json"));
 
-
-
 app.get('*', (req, res) => {
 	// console.log(req.cookies, req.user);
 	const renderer = createBundleRenderer(serverBundle, {
@@ -73,7 +71,7 @@ app.get('*', (req, res) => {
 		template,
 		clientManifest,
 	});
-	
+
 	const ctx = {
 		url: req.url,
 		title: 'Vue SSR App',

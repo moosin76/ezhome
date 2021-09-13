@@ -52,5 +52,12 @@ router.get('/auth', (req, res)=> {
 router.get('/signOut', (req, res)=> {
 	res.clearCookie('token');
 	res.json(true);
-})
+});
+
+// 아이디찾기
+router.get('/findId', async(req, res)=>{
+	const result = await modelCall(memberModel.findId, req.query);
+	res.json(result);
+});
+
 module.exports = router;

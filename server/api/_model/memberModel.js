@@ -89,6 +89,12 @@ const memberModel = {
 		const sql = sqlHelper.Update(TABLE.MEMBER, data, {mb_id});
 		db.execute(sql.query, sql.values);
 		return data;
+	},
+	async findId(data) {
+		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['mb_id']);
+		const [[row]] = await db.execute(sql.query, sql.values);
+		if(!row) throw new Error('일치하는 회원이 없습니다.');
+		return row;
 	}
 };
 
