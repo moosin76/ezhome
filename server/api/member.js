@@ -41,29 +41,34 @@ router.post('/loginLocal', async (req, res) => {
 });
 
 // 인증 
-router.get('/auth', (req, res)=> {
+router.get('/auth', (req, res) => {
 	const member = req.user;
 	const token = req.cookies.token;
 	// console.log('auth', member, token);
-	res.json({member, token});
+	res.json({ member, token });
 });
 
 // 로그아웃 
-router.get('/signOut', (req, res)=> {
+router.get('/signOut', (req, res) => {
 	res.clearCookie('token');
 	res.json(true);
 });
 
 // 아이디찾기
-router.get('/findId', async(req, res)=>{
+router.get('/findId', async (req, res) => {
 	const result = await modelCall(memberModel.findId, req.query);
 	res.json(result);
 });
 
 // 비밀번호 찾기
-router.get('/findPw', async(req, res)=> {
+router.get('/findPw', async (req, res) => {
 	const result = await modelCall(memberModel.findPw, req);
 	res.json(result);
-})
+});
 
+// 비밀번호 변경
+router.patch('/modifyPassword', async (req, res) => {
+	const result = await modelCall(memberModel.modifyPassword, req.body);
+	res.json(result);
+});
 module.exports = router;
