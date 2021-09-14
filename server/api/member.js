@@ -71,4 +71,18 @@ router.patch('/modifyPassword', async (req, res) => {
 	const result = await modelCall(memberModel.modifyPassword, req.body);
 	res.json(result);
 });
+
+// 구글 로그인 요청
+router.get('/loginGoogle', passport.authenticate('google', {
+	scope:['email', 'profile']
+}));
+
+router.get('/google-callback', (req, res)=> {
+	passport.authenticate('google', async function(err, member){
+		const result = await modelCall(memberModel.googleCallback, req, res, err, member);
+		res.end(result);
+	})(req, res);
+})
+
+
 module.exports = router;

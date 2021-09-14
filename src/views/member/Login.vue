@@ -23,6 +23,9 @@
 				</v-tabs-items>
 			</v-card-text>
 			<v-card-text class="mt-n4">
+				<v-btn @click="loginGoogle" block >구글 로그인</v-btn>
+			</v-card-text>
+			<v-card-text class="mt-n4">
 				<v-btn to="/join" block >회원가입</v-btn>
 			</v-card-text>
     </v-card>
@@ -30,7 +33,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapMutations } from 'vuex';
 import FindIdForm from '../../components/auth/FindIdForm.vue';
 import FindPwForm from '../../components/auth/FindPwForm.vue';
 import SignInForm from '../../components/auth/SignInForm.vue';
@@ -47,6 +50,7 @@ export default {
   },
 	methods : {
 		...mapActions('user', ['signInLocal', 'findIdLocal', 'findPwLocal']),
+		...mapMutations('user', ['SET_MEMBER', 'SET_TOKEN']),
 		async loginLocal(form) {
 			this.isLoading = true;
 			const data = await this.signInLocal(form);
@@ -79,6 +83,26 @@ export default {
 					'이메일 발송 성공'
 				);
 				this.tabs = 0;
+			}
+		},
+		async loginGoogle() {
+			window.open(
+				'/api/member/loginGoogle',
+				'googleAuth',
+				"top=10, left=10, width=500, height=600, status=no, menubar=no, toolbar=no, resizeable=no"
+			);
+			if(!window.onGoogleCallback) {
+				window.onGoogleCallback = this.googleLoginCallback;
+			}
+		},
+		googleLoginCallback(payload) {
+			if(payload.err) {
+				this.$toast.error(payload.err);
+			} else {
+				this.SET_MEMBER(payload.member);
+				this.SET_TOKEN(payload.token);
+				this.$router.push('/');
+				this.$toast.info(`${this.$store.state.user.member.mb_name}님 환영합니다.`);
 			}
 		}
 	}
