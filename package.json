@@ -26,6 +26,7 @@
     "passport-google-oauth2": "^0.2.0",
     "passport-kakao": "^1.0.1",
     "passport-local": "^1.0.0",
+    "passport-naver": "^1.0.6",
     "qs": "^6.10.1",
     "rand-token": "^1.0.1",
     "roboto-fontface": "*",

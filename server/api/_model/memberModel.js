@@ -196,7 +196,6 @@ const memberModel = {
 	},
 	async loginKakao(req, profile) {
 		let member = null;
-		
 		const {email} = profile._json.kakao_account;
 		const { nickname, thumbnail_image_url} = profile._json.kakao_account.profile;
 		
@@ -212,6 +211,34 @@ const memberModel = {
 				mb_name: nickname,
 				mb_email: email,
 				mb_photo: thumbnail_image_url,
+				mb_level: await getDefaultMemberLevel(),
+				mb_create_at: at,
+				mb_create_ip: ip,
+				mb_update_at: at,
+				mb_update_ip: ip,
+			};
+			const sql = sqlHelper.Insert(TABLE.MEMBER, data);
+			await db.execute(sql.query, sql.values);
+			member = await memberModel.getMemberBy({ mb_email: email });
+		}
+		return member;
+	},
+	async loginNaver(req, profile) {
+		let member = null;
+		const { email, nickname, profile_image }  = profile._json;
+		
+		try {
+			member = await memberModel.getMemberBy({ mb_email: email })
+		} catch (e) {
+			const at = moment().format('LT');
+			const ip = getIp(req);
+			const data = {
+				mb_id: profile.id,
+				mb_password: '',
+				mb_provider : profile.provider,
+				mb_name: nickname,
+				mb_email: email,
+				mb_photo: profile_image,
 				mb_level: await getDefaultMemberLevel(),
 				mb_create_at: at,
 				mb_create_ip: ip,

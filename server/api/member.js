@@ -78,6 +78,8 @@ router.get('/loginGoogle', passport.authenticate('google', {
 }));
 // 카카오 로그인 요청
 router.get('/loginKakao', passport.authenticate('kakao'));
+// 네이버 로그인 요청
+router.get('/loginNaver', passport.authenticate('naver'));
 
 router.get('/social-callback/:provider', (req, res)=> {
 	const provider = req.params.provider
