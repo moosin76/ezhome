@@ -46,7 +46,15 @@ module.exports = (app) => {
 		},
 		async function (request, accessToken, refreshToken, profile, done) {
 			if (profile && profile.id) {
-				const member = await memberModel.loginGoogle(request, profile);
+				// const member = await memberModel.loginGoogle(request, profile);
+				const data = {
+					id : profile.id, 
+					provider :  profile.provider, 
+					email : profile.email, 
+					nickname : profile.displayName, 
+					image : profile.picture,
+				};
+				const member = await memberModel.loginSocial(request, data);
 				done(null, member);
 			} else {
 				done('로그인 실패', null);
@@ -64,7 +72,15 @@ module.exports = (app) => {
 		},
 		async (request, accessToken, refreshToken, profile, done) => {
 			if (profile && profile.id) {
-				const member = await memberModel.loginKakao(request, profile);
+				// const member = await memberModel.loginKakao(request, profile);
+				const data = {
+					id : profile.id, 
+					provider :  profile.provider, 
+					email : profile._json.kakao_account.email, 
+					nickname : profile._json.kakao_account.profile.nickname, 
+					image : profile._json.kakao_account.profile.thumbnail_image_url,
+				};
+				const member = await memberModel.loginSocial(request, data);
 				done(null, member);
 			} else {
 				done('로그인 실패', null);
@@ -82,7 +98,15 @@ module.exports = (app) => {
 		async (request, accessToken, refreshToken, profile, done) => {
 			if (profile && profile.id) {
 				// console.log(profile);
-				const member = await memberModel.loginNaver(request, profile);
+				// const member = await memberModel.loginNaver(request, profile);
+				const data = {
+					id : profile.id, 
+					provider :  profile.provider, 
+					email : profile._json.email, 
+					nickname : profile._json.nickname, 
+					image : profile._json.profile_image,
+				};
+				const member = await memberModel.loginSocial(request, data);
 				done(null, member);
 			} else {
 				done('로그인 실패', null);

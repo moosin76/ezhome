@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-card-actions>
-      <v-btn color="primary" block>회원정보수정</v-btn>
+      <v-btn color="primary" @click="$emit('open')" block>회원정보수정</v-btn>
     </v-card-actions>
     <v-card-actions>
       <v-btn color="secondary" @click="logout" block>로그아웃</v-btn>
@@ -10,15 +10,14 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
+import { mapActions, mapState } from "vuex";
 export default {
   name: "MemberMenu",
-  props: {
-    member: {
-      type: Object,
-      default: null,
-    },
-  },
+	computed : {
+		...mapState({
+			member : state => state.user.member,
+		})
+	},
   methods: {
     ...mapActions("user", ["signOut"]),
     async logout() {
