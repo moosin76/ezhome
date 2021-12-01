@@ -168,36 +168,9 @@ const memberModel = {
 		db.execute(delSql.query, delSql.values);
 		return upRes.affectedRows == 1;
 	},
-	async loginGoogle(req, profile) {
+	async loginSocial(req, data) {
 		let member = null;
-		try {
-			member = await memberModel.getMemberBy({ mb_email: profile.email })
-		} catch (e) {
-			const at = moment().format('LT');
-			const ip = getIp(req);
-			const data = {
-				mb_id: profile.id,
-				mb_password: '',
-				mb_provider : profile.provider,
-				mb_name: profile.displayName,
-				mb_email: profile.email,
-				mb_photo: profile.picture,
-				mb_level: await getDefaultMemberLevel(),
-				mb_create_at: at,
-				mb_create_ip: ip,
-				mb_update_at: at,
-				mb_update_ip: ip,
-			};
-			const sql = sqlHelper.Insert(TABLE.MEMBER, data);
-			await db.execute(sql.query, sql.values);
-			member = await memberModel.getMemberBy({ mb_email: profile.email });
-		}
-		return member;
-	},
-	async loginKakao(req, profile) {
-		let member = null;
-		const {email} = profile._json.kakao_account;
-		const { nickname, thumbnail_image_url} = profile._json.kakao_account.profile;
+		const { id, provider, email, nickname, image }  = data;
 		
 		try {
 			member = await memberModel.getMemberBy({ mb_email: email })
@@ -205,40 +178,12 @@ const memberModel = {
 			const at = moment().format('LT');
 			const ip = getIp(req);
 			const data = {
-				mb_id: profile.id,
+				mb_id: id,
 				mb_password: '',
-				mb_provider : profile.provider,
+				mb_provider : provider,
 				mb_name: nickname,
 				mb_email: email,
-				mb_photo: thumbnail_image_url,
-				mb_level: await getDefaultMemberLevel(),
-				mb_create_at: at,
-				mb_create_ip: ip,
-				mb_update_at: at,
-				mb_update_ip: ip,
-			};
-			const sql = sqlHelper.Insert(TABLE.MEMBER, data);
-			await db.execute(sql.query, sql.values);
-			member = await memberModel.getMemberBy({ mb_email: email });
-		}
-		return member;
-	},
-	async loginNaver(req, profile) {
-		let member = null;
-		const { email, nickname, profile_image }  = profile._json;
-		
-		try {
-			member = await memberModel.getMemberBy({ mb_email: email })
-		} catch (e) {
-			const at = moment().format('LT');
-			const ip = getIp(req);
-			const data = {
-				mb_id: profile.id,
-				mb_password: '',
-				mb_provider : profile.provider,
-				mb_name: nickname,
-				mb_email: email,
-				mb_photo: profile_image,
+				mb_photo: image,
 				mb_level: await getDefaultMemberLevel(),
 				mb_create_at: at,
 				mb_create_ip: ip,
@@ -270,6 +215,22 @@ const memberModel = {
 
 		html = html.replace('{{payload}}', JSON.stringify(payload));
 		return html;
+	},
+	async checkPassword(req) {
+		if(!req.user) {
+			throw new Error('로그인 되어 있지 않습니다.');
+		}
+		const data = {
+			mb_id : req.user.mb_id,
+			mb_password : await jwt.generatePassword(req.body.mb_password),
+		};
+		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['COUNT(*) AS cnt']);
+		const [[{cnt}]] = await db.execute(sql.query, sql.values);
+		if(cnt == 0) {
+			throw new Error('비밀번호가 올바르지 않습니다.');
+		} else {
+			return true;
+		}
 	}
 };
 

@@ -91,5 +91,9 @@ router.get('/social-callback/:provider', (req, res)=> {
 	})(req, res);
 })
 
-
+// 비밀번호 확인
+router.post('/checkPassword', async(req, res)=>{
+	const result = await modelCall(memberModel.checkPassword, req);
+	res.json(result);
+})
 module.exports = router;
