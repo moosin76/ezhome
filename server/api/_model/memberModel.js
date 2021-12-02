@@ -1,4 +1,6 @@
 const fs = require('fs');
+const path = require('path');
+
 const db = require('../../plugins/mysql');
 const jwt = require('../../plugins/jwt');
 const sendMailer = require('../../plugins/sendMailer');
@@ -60,8 +62,10 @@ const memberModel = {
 		}
 		// 이미지 업로드 처리
 		delete payload.mb_image;
+		const fileName = jwt.getRandToken(16);
 		if (req.files && req.files.mb_image) {
-			req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${payload.mb_id}.jpg`, (err) => {
+			payload.mb_photo = `/upload/memberPhoto/${fileName}.jpg`;
+			req.files.mb_image.mv(`${MEMBER_PHOTO_PATH}/${fileName}.jpg`, (err) => {
 				if (err) {
 					console.log("Member Image Upload Error", err);
 				}
@@ -75,7 +79,69 @@ const memberModel = {
 		return row.affectedRows == 1;
 	},
 	async updateMember(req) {
-		return {body : req.body, file :req.files}
+		// return {body : req.body, file:req.files};
+		const at = moment().format('LT');
+		const ip = getIp(req);
+
+		const payload = {
+			...req.body,
+			mb_update_at : at,
+			mb_update_ip : ip,
+		};
+
+		const admMode = payload.admMode;
+		const mb_id = payload.mb_id;
+		const deleteImage = payload.deleteImage;
+		delete payload.admMode;
+		delete payload.mb_id;
+		delete payload.deleteImage;
+
+		// 비밀번호가 변경 해야 한다
+		if(payload.mb_password) {
+			payload.mb_password = jwt.generatePassword(payload.mb_password);
+		} else {
+			delete payload.mb_password;
+		}
+
+		// 이미지 처리
+		delete payload.mb_image;
+		const mb_photo = payload.mb_photo;
+		const photoPathInfo = path.parse(mb_photo);
+		const oldName = photoPathInfo.name;
+		const oldFile = `${MEMBER_PHOTO_PATH}/${oldName}.jpg`;
+		const cachePath = `${MEMBER_PHOTO_PATH}/.cache`;
+
+		// 기존 이미지 삭제
+		if(deleteImage || (req.files && req.files.mb_image)) {
+			payload.mb_photo = '';
+			try {
+				fs.unlink(oldFile);
+				const cacheDir = fs.readdirSync(cachePath);
+				for(const p of cacheDir) {
+					if(p.startsWith(oldName)) {
+						try {
+							fs.unlinkSync(`${cachePath}/${p}`);
+						} catch(e) {}
+					}
+				}
+			} catch(e) {}
+		}
+
+		// 이미지 업로드 되었으면 처리
+		if(req.files && req.files.mb_image) {
+			const newName = jwt.getRandToken(16);
+			payload.mb_photo = `/upload/memberPhoto/${newName}.jpg`;
+			const newFile = `${MEMBER_PHOTO_PATH}/${newName}.jpg`;
+			req.files.mb_image.mv(newFile, (err)=>{
+				if(err) {
+					console.log('Member Photo 업로드 실패', err);
+				}
+			})
+		}
+
+		const sql = sqlHelper.Update(TABLE.MEMBER, payload, {mb_id});
+		const [row] = await db.execute(sql.query, sql.values);
+		return await memberModel.getMemberBy({mb_id});
 	},
 	async getMemberBy(form, cols = []) {
 		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, form, cols);

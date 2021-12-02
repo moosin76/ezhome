@@ -76,6 +76,9 @@ export const actions = {
 	async updateMember({commit}, form) {
 		const {$axios} = Vue.prototype;
 		const data = await $axios.patch(`/api/member`, form);
-		return data;
+		if(data) {
+			commit('SET_MEMBER', data);
+		}
+		return !!data;
 	}
 };

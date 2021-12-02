@@ -32,6 +32,7 @@
         </v-toolbar>
 				<v-card-text>
 					<user-update-form
+						v-if="dialog"
 						:member="member"
 						:isLoading="isLoading"
 						@onSave="save"
@@ -97,8 +98,13 @@ export default {
       this.dialog = false;
     },
 		async save(form) {
+			this.isLoading = true;
 			const data = await this.updateMember(form);
-			console.log(data);
+			if(data) {
+				this.$toast.info(`${this.$store.state.user.member.mb_name}님 정보 수정하였습니다.`);
+				this.closeDialog();
+			}
+			this.isLoading = false;
 		}
   },
 };
