@@ -49,7 +49,7 @@ export default {
   },
   data() {
     return {
-      isCheck: false,
+      isCheck: this.origin ? true : !this.cbCheck,
       loading: false,
 			errMsg : "",
 			successMsg : "",

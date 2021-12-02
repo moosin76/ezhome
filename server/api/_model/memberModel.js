@@ -74,6 +74,9 @@ const memberModel = {
 
 		return row.affectedRows == 1;
 	},
+	async updateMember(req) {
+		return {body : req.body, file :req.files}
+	},
 	async getMemberBy(form, cols = []) {
 		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, form, cols);
 		const [[row]] = await db.execute(sql.query, sql.values);

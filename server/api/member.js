@@ -15,6 +15,12 @@ router.get('/duplicateCheck/:field/:value', async (req, res) => {
 router.post('/', async (req, res) => {
 	const result = await modelCall(memberModel.createMember, req);
 	res.json(result);
+});
+
+// 회원정보수정
+router.patch('/', async (req, res)=> {
+	const result = await modelCall(memberModel.updateMember, req);
+	res.json(result);
 })
 
 // 로그인

@@ -30,6 +30,13 @@
             <v-icon>mdi-close</v-icon>
           </v-btn>
         </v-toolbar>
+				<v-card-text>
+					<user-update-form
+						:member="member"
+						:isLoading="isLoading"
+						@onSave="save"
+					/>
+				</v-card-text>
       </v-card>
     </v-dialog>
   </div>
@@ -37,11 +44,12 @@
 
 <script>
 import { mapActions, mapState } from "vuex";
+import UserUpdateForm from '../auth/UserUpdateForm.vue';
 import DisplayAvatar from "./DisplayAvatar.vue";
 import MemberMenu from "./MemberMenu.vue";
 import NoMemberMenu from "./NoMemberMenu.vue";
 export default {
-  components: { DisplayAvatar, NoMemberMenu, MemberMenu },
+  components: { DisplayAvatar, NoMemberMenu, MemberMenu, UserUpdateForm },
   name: "SiteUser",
   data() {
     return {
@@ -61,7 +69,7 @@ export default {
     this.getDarkMode();
   },
   methods: {
-		...mapActions('user', ['checkPassword']),
+		...mapActions('user', ['checkPassword', 'updateMember']),
     setDarkMode(mode) {
       this.$vuetify.theme.dark = mode;
       localStorage.setItem("darkMode", mode ? "dark" : "light");
@@ -71,7 +79,8 @@ export default {
       this.$vuetify.theme.dark = mode;
     },
     async openDialog() {
-      // this.dialog = true;
+      this.dialog = true;
+			return;
 			// 소셜로그인 아니면 비밀번호를 확인
 			if(this.member.mb_provider) {
 				this.dialog = true;
@@ -87,6 +96,10 @@ export default {
     closeDialog() {
       this.dialog = false;
     },
+		async save(form) {
+			const data = await this.updateMember(form);
+			console.log(data);
+		}
   },
 };
 </script>
