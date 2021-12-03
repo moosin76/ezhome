@@ -6,6 +6,7 @@ import { sync } from "vuex-router-sync";
 
 import vuetify from './plugins/vuetify'
 import './plugins/axios'
+import './plugins/moment';
 import '@babel/polyfill'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'

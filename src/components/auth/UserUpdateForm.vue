@@ -91,6 +91,9 @@
     <v-btn type="submit" block color="primary" :loading="isLoading">
       정보 수정
     </v-btn>
+		<v-btn class="mt-4" block color="error" :loading="isLoading" @click="$emit('onLeave')">
+      회원 탈퇴
+    </v-btn>
   </v-form>
 </template>
 

@@ -36,6 +36,7 @@
 						:member="member"
 						:isLoading="isLoading"
 						@onSave="save"
+						@onLeave="leave"
 					/>
 				</v-card-text>
       </v-card>
@@ -70,7 +71,7 @@ export default {
     this.getDarkMode();
   },
   methods: {
-		...mapActions('user', ['checkPassword', 'updateMember']),
+		...mapActions('user', ['checkPassword', 'updateMember', 'signOut']),
     setDarkMode(mode) {
       this.$vuetify.theme.dark = mode;
       localStorage.setItem("darkMode", mode ? "dark" : "light");
@@ -105,6 +106,29 @@ export default {
 				this.closeDialog();
 			}
 			this.isLoading = false;
+		},
+		async leave() {
+			const result = await this.$ezNotify.confirm(
+				'정말로 탈퇴 하시겠습니까?',
+				'회원탈퇴',
+				{icon : "mdi-alert"}
+			);
+			if(!result) return;
+			const form = {
+				mb_id : this.member.mb_id,
+				mb_leave_at : this.$moment().format('LT'),
+			};
+			this.isLoading = true;
+			const data = await this.updateMember(form);
+			this.isLoading = false;
+			if(data) {
+				this.closeDialog();
+				const mb_name = await this.signOut();
+				this.$toast.info(`${mb_name}님 탈퇴 하였습니다.`);
+				if(this.$route.name != 'Home') {
+					this.$router.push('/');
+				}
+			}
 		}
   },
 };

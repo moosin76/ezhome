@@ -6,6 +6,7 @@ const memberModel = require('../api/_model/memberModel');
 const GoogleStrategy = require('passport-google-oauth2').Strategy;
 const KakaoStrategy = require('passport-kakao').Strategy;
 const NaverStrategy = require('passport-naver').Strategy;
+const { LV } = require('../../util/level');
 
 const {
 	GOOGLE_CLIENT_ID,
@@ -16,6 +17,19 @@ const {
 	NAVER_CLIENT_ID,
 	NAVER_CLIENT_SECRET,
 } = process.env;
+
+function loginRules(member) {
+	// 탈퇴회원
+	if(member.mb_leave_at) {
+		return '탈퇴 회원입니다.';
+	}
+	switch(member.mb_level) {
+		case LV.AWAIT :
+			return '대기 회원입니다.';
+		case LV.BLOCK : 
+			return '차단 회원입니다.';
+	}
+}
 
 module.exports = (app) => {
 	app.use(passport.initialize());
@@ -29,6 +43,10 @@ module.exports = (app) => {
 			try {
 				mb_password = jwt.generatePassword(mb_password);
 				const member = await memberModel.getMemberBy({ mb_id, mb_password });
+				const msg = loginRules(member);
+				if(msg) {
+					return done(null, null, msg);
+				}
 				return done(null, member);
 			} catch (e) {
 				console.log(e.message);
@@ -48,13 +66,17 @@ module.exports = (app) => {
 			if (profile && profile.id) {
 				// const member = await memberModel.loginGoogle(request, profile);
 				const data = {
-					id : profile.id, 
-					provider :  profile.provider, 
-					email : profile.email, 
-					nickname : profile.displayName, 
-					image : profile.picture,
+					id: profile.id,
+					provider: profile.provider,
+					email: profile.email,
+					nickname: profile.displayName,
+					image: profile.picture,
 				};
 				const member = await memberModel.loginSocial(request, data);
+				const msg = loginRules(member);
+				if(msg) {
+					return done(null, null, msg);
+				}
 				done(null, member);
 			} else {
 				done('로그인 실패', null);
@@ -74,13 +96,17 @@ module.exports = (app) => {
 			if (profile && profile.id) {
 				// const member = await memberModel.loginKakao(request, profile);
 				const data = {
-					id : profile.id, 
-					provider :  profile.provider, 
-					email : profile._json.kakao_account.email, 
-					nickname : profile._json.kakao_account.profile.nickname, 
-					image : profile._json.kakao_account.profile.thumbnail_image_url,
+					id: profile.id,
+					provider: profile.provider,
+					email: profile._json.kakao_account.email,
+					nickname: profile._json.kakao_account.profile.nickname,
+					image: profile._json.kakao_account.profile.thumbnail_image_url,
 				};
 				const member = await memberModel.loginSocial(request, data);
+				const msg = loginRules(member);
+				if(msg) {
+					return done(null, null, msg);
+				}
 				done(null, member);
 			} else {
 				done('로그인 실패', null);
@@ -100,13 +126,17 @@ module.exports = (app) => {
 				// console.log(profile);
 				// const member = await memberModel.loginNaver(request, profile);
 				const data = {
-					id : profile.id, 
-					provider :  profile.provider, 
-					email : profile._json.email, 
-					nickname : profile._json.nickname, 
-					image : profile._json.profile_image,
+					id: profile.id,
+					provider: profile.provider,
+					email: profile._json.email,
+					nickname: profile._json.nickname,
+					image: profile._json.profile_image,
 				};
 				const member = await memberModel.loginSocial(request, data);
+				const msg = loginRules(member);
+				if(msg) {
+					return done(null, null, msg);
+				}
 				done(null, member);
 			} else {
 				done('로그인 실패', null);

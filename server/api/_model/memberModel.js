@@ -105,7 +105,7 @@ const memberModel = {
 
 		// 이미지 처리
 		delete payload.mb_image;
-		const mb_photo = payload.mb_photo;
+		const mb_photo = payload.mb_photo || '';
 		const photoPathInfo = path.parse(mb_photo);
 		const oldName = photoPathInfo.name;
 		const oldFile = `${MEMBER_PHOTO_PATH}/${oldName}.jpg`;
@@ -115,7 +115,7 @@ const memberModel = {
 		if(deleteImage || (req.files && req.files.mb_image)) {
 			payload.mb_photo = '';
 			try {
-				fs.unlink(oldFile);
+				fs.unlinkSync(oldFile);
 				const cacheDir = fs.readdirSync(cachePath);
 				for(const p of cacheDir) {
 					if(p.startsWith(oldName)) {
