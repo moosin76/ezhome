@@ -52,8 +52,8 @@ app.use('/upload/:_path', thumbnail(path.join(__dirname, './upload')));
 app.use(express.static(path.join(__dirname, "../dist")));
 
 // API 라우터
-const memberRouter = require('./api/member');
-app.use('/api/member', memberRouter);
+const autoRoute = require('./autoRoute');
+autoRoute('/api', app);
 app.use('/api/*', (req, res) => {
 	res.json({ err: '요청하신 API가 없습니다. : ' + req.url });
 });

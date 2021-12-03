@@ -4,9 +4,7 @@ import { createRouter } from './router'
 import { createStore } from './store'
 import { sync } from "vuex-router-sync";
 
-import vuetify from './plugins/vuetify'
-import './plugins/axios'
-import './plugins/moment';
+import plugins from './plugins';
 import '@babel/polyfill'
 import 'roboto-fontface/css/roboto/roboto-fontface.css'
 import '@mdi/font/css/materialdesignicons.css'
@@ -25,7 +23,7 @@ export function createApp(ctx) {
 		data: { url: ctx ? ctx.url : '' },
 		router,
 		store,
-		vuetify,
+		vuetify : plugins.vuetify,
 		render: h => h(App)
 	});
 
