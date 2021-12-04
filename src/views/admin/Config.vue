@@ -14,8 +14,9 @@
       max-width="500"
       dark
       color="primary"
+			persistent
     >
-			<v-btn @click="save">닫기</v-btn>
+			<config-form @save="save" />
     </ez-dialog>
   </v-container>
 </template>
@@ -23,14 +24,16 @@
 <script>
 import EzDialog from "../../components/etc/EzDialog.vue";
 import TooltipBtn from "../../components/etc/TooltipBtn.vue";
+import ConfigForm from './ConfigComponent/ConfigForm.vue';
 export default {
-  components: { TooltipBtn, EzDialog },
+  components: { TooltipBtn, EzDialog, ConfigForm },
   name: "AdmConfig",
   methods: {
     addConfig() {
       this.$refs.dialog.open();
     },
-		save() {
+		async save(form) {
+			console.log(form);
 			this.$refs.dialog.close();
 		}
   },
