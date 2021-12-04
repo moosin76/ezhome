@@ -30,6 +30,21 @@ const sqlHelper = {
 		query = query.replace('{2}', prepare);
 		return { query, values };
 	},
+	InsertOrUpdate(table, data) {
+		let query = `INSERT INTO ${table} ({1}) VALUES ({2}) ON DUPLICATE KEY UPDATE {3}`;
+		const keys = Object.keys(data);
+		const prepare = new Array(keys.length).fill('?').join(', ');
+		const values = [];
+		const sets = [];
+		for (const key of keys) {
+			values.push(data[key]);
+			sets.push(`${key}=?`);
+		}
+		query = query.replace('{1}', keys.join(', '));
+		query = query.replace('{2}', prepare);
+		query = query.replace('{3}', sets.join(', '));
+		return { query, values : values.concat(values)};
+	},
 	Update(table, data, where) {
 		let query = `UPDATE ${table} SET {1} WHERE {2}`;
 		const keys = Object.keys(data);

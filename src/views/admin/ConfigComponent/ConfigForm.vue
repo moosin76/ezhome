@@ -38,7 +38,7 @@
 			thumb-color="primary"
 			thumb-label
     />
-		<v-text-field label="설명" v-model="form.cf_comment"/>
+		<v-textarea label="설명" v-model="form.cf_comment"/>
 		<v-btn type="submit" block>저장</v-btn>
   </v-form>
 </template>
@@ -84,6 +84,7 @@ export default {
 			await this.$nextTick();
 			if(!this.valid) return;
 			if(!this.$refs.cfKey.validate()) return;
+			this.form.cf_sort = 0;
 			this.$emit('save', this.form);
 		},
   },
