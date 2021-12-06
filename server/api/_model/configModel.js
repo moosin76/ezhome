@@ -39,12 +39,21 @@ const configModel = {
 		return data;
 	},
 	async sortUpdate(req) {
-		req.body.forEach((item)=>{
-			const {cf_key, cf_sort} = item;
-			const sql = sqlHelper.Update(TABLE.CONFIG, {cf_sort}, {cf_key});
+		req.body.forEach((item) => {
+			const { cf_key, cf_sort } = item;
+			const sql = sqlHelper.Update(TABLE.CONFIG, { cf_sort }, { cf_key });
 			db.execute(sql.query, sql.values);
 		});
 		return true;
+	},
+	async removeConfig(req) {
+		if (!isGrant(req, LV.SUPER)) {
+			throw new Error('최고관리자만 삭제가 가능합니다.');
+		}
+		const { cf_key } = req.params;
+		const sql = sqlHelper.DeleteSimple(TABLE.CONFIG, { cf_key });
+		const [row] = await db.execute(sql.query, sql.values);
+		return row.affectedRows == 1;
 	}
 };
 

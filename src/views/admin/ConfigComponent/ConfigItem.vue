@@ -18,7 +18,7 @@
           </v-tooltip>
         </td>
         <td>
-          <v-btn icon color="primary">
+          <v-btn icon color="primary" @click="$emit('update', item)">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
         </td>
@@ -46,7 +46,7 @@
           </v-tooltip>
         </td>
         <td>
-          <v-btn icon color="error">
+          <v-btn icon color="error" @click="$emit('remove', item)">
             <v-icon>mdi-delete</v-icon>
           </v-btn>
         </td>
