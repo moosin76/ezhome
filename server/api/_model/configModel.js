@@ -38,6 +38,14 @@ const configModel = {
 		const [row] = await db.execute(sql.query, sql.values);
 		return data;
 	},
+	async sortUpdate(req) {
+		req.body.forEach((item)=>{
+			const {cf_key, cf_sort} = item;
+			const sql = sqlHelper.Update(TABLE.CONFIG, {cf_sort}, {cf_key});
+			db.execute(sql.query, sql.values);
+		});
+		return true;
+	}
 };
 
 module.exports = configModel;

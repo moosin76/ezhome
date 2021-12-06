@@ -17,6 +17,16 @@
       </v-col>
     </v-row>
 
+		<draggable tag="ul" :list="curItems" class="config-list-group" handle=".handle" @end="sortEnd">
+			<config-item 
+				class="list-group-item"
+				v-for="item in curItems"
+				:key="item.cf_key"
+				:item="item"
+			/>
+
+		</draggable>
+
     <ez-dialog
       label="설정 추가"
       ref="dialog"
@@ -35,8 +45,11 @@ import { mapActions } from "vuex";
 import EzDialog from "../../components/etc/EzDialog.vue";
 import TooltipBtn from "../../components/etc/TooltipBtn.vue";
 import ConfigForm from "./ConfigComponent/ConfigForm.vue";
+import draggable from 'vuedraggable';
+import ConfigItem from './ConfigComponent/ConfigItem.vue';
+
 export default {
-  components: { TooltipBtn, EzDialog, ConfigForm },
+  components: { TooltipBtn, EzDialog, ConfigForm, draggable, ConfigItem },
   name: "AdmConfig",
   data() {
     return {
@@ -89,6 +102,18 @@ export default {
       this.items = await this.$axios.get("/api/config?all=true");
       console.log(this.groupItems);
     },
+		sortEnd() {
+			let i =0;
+			const payload = [];
+			this.curItems.forEach((item)=>{
+				item.cf_sort = i++;
+				payload.push({
+					cf_key : item.cf_key,
+					cf_sort : item.cf_sort
+				})
+			});
+			this.$axios.put('/api/config', payload);
+		}
   },
 };
 </script>

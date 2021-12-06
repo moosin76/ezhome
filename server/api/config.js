@@ -16,4 +16,9 @@ router.post('/', async (req, res) => {
 	const result = await modelCall(configModel.saveConfig, req);
 	res.json(result);
 });
+
+router.put('/', async (req, res)=> {
+	const result = await modelCall(configModel.sortUpdate, req);
+	res.json(result);
+})
 module.exports = router;
