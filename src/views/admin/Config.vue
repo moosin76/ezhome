@@ -138,7 +138,6 @@ export default {
     },
     async fetchData() {
       this.items = await this.$axios.get("/api/config?all=true");
-      console.log(this.groupItems);
     },
     sortEnd() {
       let i = 0;

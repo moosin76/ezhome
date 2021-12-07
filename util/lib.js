@@ -24,7 +24,7 @@ const lib = {
 	findParentVm(vm, target) {
 		let parent = vm.$parent;
 		while(parent.$vnode) {
-			console.log(parent.$vnode.tag);
+			// console.log(parent.$vnode.tag);
 			if(parent.$vnode.tag.endsWith(target)) {
 				return parent;
 			}

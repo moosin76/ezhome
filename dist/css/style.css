@@ -1,0 +1,21 @@
+.v-application .config-list-group {
+	list-style : none;
+	padding: 0;
+}
+.config-list-group .list-group-item {
+	padding : 0;
+	display: flex;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	margin-top: 8px;
+}
+.config-list-group table {padding: 4px;width: 100%;}
+.config-list-group table tr + tr td {border-top : 1px dashed #ccc;}
+.config-list-group table td {padding: 4px;}
+.config-list-group table tr td:nth-child(1) {width: 20%;}
+.config-list-group table tr td:nth-child(2) {width: auto;}
+.config-list-group table tr td:nth-child(3) {width: 32px;}
+.config-list-group table tr td:nth-child(4) {width: 36px;}
+.config-list-group .client {position: relative; left:5px}
+.config-list-group .comment {font-size: 0.9em;}
+.config-list-group .handle {cursor: grab;}

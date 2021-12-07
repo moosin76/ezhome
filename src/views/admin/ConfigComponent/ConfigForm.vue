@@ -12,8 +12,8 @@
           <span v-on="on" v-bind="attrs" class="mr-2">
             <v-checkbox
               v-model="form.cf_client"
-              true-value="1"
-              false-value="0"
+              :true-value="1"
+              :false-value="0"
             ></v-checkbox>
           </span>
         </template>
