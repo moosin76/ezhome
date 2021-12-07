@@ -28,7 +28,7 @@
           <b>{{ item.cf_key }}</b>
         </td>
         <td>
-          {{ item.cf_val }}
+          <type-value v-model="item.cf_val" :fieldType="item.cf_type" :readonly="true"/>
         </td>
         <td>
           <v-tooltip top>
@@ -56,7 +56,9 @@
 </template>
 
 <script>
+import TypeValue from './TypeValue.vue';
 export default {
+  components: { TypeValue },
   name: "ConfigItem",
   props: {
     item: {

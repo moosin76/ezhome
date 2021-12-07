@@ -25,7 +25,7 @@
         v-model="form.cf_key"
         :cbCheck="keyCheck"
         :origin="originKey"
-				:readonly="!!item"
+        :readonly="!!item"
         :rules="[rules.require({ label: '키' }), rules.alphaNum()]"
       />
     </div>
@@ -51,6 +51,8 @@ import InputDuplicateCheck from "../../../components/InputForms/InputDuplicateCh
 import { LV } from "../../../../util/level";
 import TypeValue from "./TypeValue.vue";
 import { deepCopy, findParentVm } from "../../../../util/lib";
+import jsonStringify from "json-stable-stringify";
+
 export default {
   components: { InputDuplicateCheck, TypeValue },
   name: "ConfigForm",
@@ -103,6 +105,10 @@ export default {
     init() {
       if (this.item) {
         this.form = deepCopy(this.item);
+        if (this.form.cf_type == "Json") {
+          const obj = JSON.parse(this.form.cf_val);
+          this.form.cf_val = jsonStringify(obj, { space: "  " });
+        }
       } else {
         this.form = {
           cf_key: "",
@@ -115,26 +121,35 @@ export default {
           cf_client: 0,
         };
       }
-			if(this.$refs.form) {
-				this.$refs.form.resetValidation();
-			}
+      if (this.$refs.form) {
+        this.$refs.form.resetValidation();
+      }
     },
     async save() {
       this.$refs.form.validate();
       await this.$nextTick();
       if (!this.valid) return;
       if (!this.$refs.cfKey.validate()) return;
-			if(!this.item) {
-				let i = 0;
-				const parent = findParentVm(this, 'AdmConfig');
-				parent.items.forEach((item)=>{
-					if(item.cf_group == this.form.cf_group) {
-						i++;
-					}
-				});
-				this.form.cf_sort = i;
-			}
-      this.$emit("save", this.form);
+      if (!this.item) {
+        let i = 0;
+        const parent = findParentVm(this, "AdmConfig");
+        parent.items.forEach((item) => {
+          if (item.cf_group == this.form.cf_group) {
+            i++;
+          }
+        });
+        this.form.cf_sort = i;
+      }
+      try {
+        if (this.form.cf_type == "Json") {
+          const obj = JSON.parse(this.form.cf_val);
+          this.form.cf_val = JSON.stringify(obj);
+        }
+        this.$emit("save", this.form);
+        this.init();
+      } catch (e) {
+        this.$toast.error("JSON 형식이 올바르지 않습니다.");
+      }
     },
   },
 };
