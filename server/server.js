@@ -3,6 +3,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
+require('./plugins/pm2Bus');
 
 (async function () {
 	// 앱 초기화
@@ -12,7 +13,11 @@ const fs = require('fs');
 
 	const configModel = require('./api/_model/configModel');
 	await configModel.load();
-	
+
+	setInterval(() => {
+		console.log($config.client.test1, $config.server.test1)
+	}, 5000);
+
 	let isDiableKeepAlive = false;
 	app.use((req, res, next) => {
 		if (isDiableKeepAlive) {
@@ -82,7 +87,7 @@ const fs = require('fs');
 			metas: `<!-- inject more metas -->`,
 			token: req.cookies.token || null,
 			member: req.user || null,
-			config : $config.client,
+			config: $config.client,
 		};
 
 		const stream = renderer.renderToStream(ctx);

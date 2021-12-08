@@ -8,27 +8,39 @@ const configModel = {
 		const sql = sqlHelper.SelectSimple(TABLE.CONFIG, null, ['cf_key', 'cf_val', 'cf_client', 'cf_type']);
 		const [rows] = await db.execute(sql.query, sql.values);
 		global.$config = {
-			server : {},
-			client : {}
+			server: {},
+			client: {}
 		};
-		for(const row of rows) {
-			this.setConfigItem(row);
+		for (const row of rows) {
+			this.setConfigItem(row, true);
 		}
 	},
-	setConfigItem(item) {
-		configModel.clearConfigItem(item.cf_key);
-		if(item.cf_type == 'Json') {
+	setConfigItem(item, isLoading = false) {
+		configModel.clearConfigItem(item.cf_key, isLoading);
+		if (item.cf_type == 'Json') {
 			item.cf_val = JSON.parse(item.cf_val);
 		}
-		if(item.cf_client) {
-			$config.client[item.cf_key] = item.cf_val;	
+		if (item.cf_client) {
+			$config.client[item.cf_key] = item.cf_val;
 		} else {
 			$config.server[item.cf_key] = item.cf_val;
 		}
+		if (!isLoading) {
+			process.send({
+				type: "config:update",
+				data: item,
+			})
+		}
 	},
-	clearConfigItem(cf_key) {
+	clearConfigItem(cf_key, isLoading = false) {
 		delete $config.server[cf_key];
 		delete $config.client[cf_key];
+		if (!isLoading) {
+			process.send({
+				type: "config:remove",
+				data: cf_key,
+			})
+		}
 	},
 	async duplicateCheck({ field, value }) {
 		const sql = sqlHelper.SelectSimple(
@@ -57,7 +69,7 @@ const configModel = {
 		} else {
 			return $config.client;
 		};
-		
+
 	},
 	async saveConfig(req) {
 		const data = req.body;
