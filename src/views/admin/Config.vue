@@ -116,10 +116,10 @@ export default {
       if (this.item) {
         this.$toast.info(`[${form.cf_name}] 수정 하였습니다.`);
         const idx = this.items.indexOf(this.item);
-        this.items.splice(idx, 1, data);
+        this.items.splice(idx, 1, form);
       } else {
         this.$toast.info(`[${form.cf_name}] 추가 하였습니다.`);
-        this.items.push(data);
+        this.items.push(form);
       }
       this.setCurItems();
       this.$refs.dialog.close();

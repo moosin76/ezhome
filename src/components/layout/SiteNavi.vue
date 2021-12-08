@@ -1,14 +1,14 @@
 <template>
   <div>
-		<v-app-bar v-if="!isLg" dark color="primary">
-			<v-app-bar-title>
-				<site-title />
-			</v-app-bar-title>
-			<v-spacer></v-spacer>
-			<v-btn icon @click="$emit('close')">
-				<v-icon>mdi-close</v-icon>
-			</v-btn>
-		</v-app-bar>
+    <v-app-bar v-if="!isLg" dark color="primary">
+      <v-app-bar-title>
+        <site-title />
+      </v-app-bar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="$emit('close')">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-app-bar>
     <v-list>
       <nested-menu :items="items" />
     </v-list>
@@ -19,7 +19,7 @@
 import { mapState } from "vuex";
 import NestedMenu from "./NestedMenu.vue";
 import { deepCopy } from "../../../util/lib";
-import SiteTitle from './SiteTitle.vue';
+import SiteTitle from "./SiteTitle.vue";
 
 export default {
   components: { NestedMenu, SiteTitle },
@@ -33,10 +33,15 @@ export default {
     ...mapState({
       menu: (state) => state.config.menu,
     }),
-		isLg() {
-			const {lg, xl} = this.$vuetify.breakpoint;
-			return lg || xl;
-		}
+    isLg() {
+      const { lg, xl } = this.$vuetify.breakpoint;
+      return lg || xl;
+    },
+  },
+  watch: {
+    menu() {
+      this.initMenu();
+    },
   },
   created() {
     this.initMenu();

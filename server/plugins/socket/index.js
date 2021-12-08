@@ -1,8 +1,13 @@
+require('dotenv').config();
 const { Server } = require('socket.io');
+const redisAdapter = require('socket.io-redis');
 const ConfigHandler = require('./ConfigHandler');
+
+const { REDIS_HOST, REDIS_PORT } = process.env;
 
 module.exports = function (webServer) {
 	const io = new Server(webServer);
+	io.adapter(redisAdapter({ host: REDIS_HOST, port: REDIS_PORT }));
 
 	io.on('connection', (socket) => {
 		ConfigHandler(io, socket);
