@@ -48,13 +48,12 @@ export default {
   title() {
     return this.title;
   },
-  mounted() {
-    this.$socket.on("room:testmsg", (data) => {
-      console.log("room:testmsg", data);
-    });
-  },
-  destroyed() {
-    this.$socket.off("room:testmsg");
+  socket() {
+    return {
+      "room:testmsg": (data) => {
+        console.log("room:testmsg", data);
+      },
+    };
   },
   methods: {
     toastTest1() {
