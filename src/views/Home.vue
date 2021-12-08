@@ -34,6 +34,7 @@
       <v-btn @click="sendMsg3">룸 보내기</v-btn>
       <v-btn @click="sendMsg4">룸 브로드캐스팅 보내기</v-btn>
     </div>
+    <div>{{ $store.state.config.test1 }}</div>
   </div>
 </template>
 

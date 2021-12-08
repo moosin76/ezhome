@@ -1,9 +1,12 @@
 const { Server } = require('socket.io');
+const ConfigHandler = require('./ConfigHandler');
 
 module.exports = function (webServer) {
 	const io = new Server(webServer);
 
 	io.on('connection', (socket) => {
+		ConfigHandler(io, socket);
+
 		console.log('a user connected' + socket.id);
 
 		socket.on('disconnect', () => {
