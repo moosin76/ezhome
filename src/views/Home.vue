@@ -21,25 +21,41 @@
       <v-btn @click="notifyTest3">Prompt</v-btn>
     </div>
     <h1>Axios 테스트</h1>
-		<div>
-			<v-btn @click="axiosTest1">Test</v-btn>
-			<v-btn @click="axiosTest2">Error</v-btn>
-		</div>
+    <div>
+      <v-btn @click="axiosTest1">Test</v-btn>
+      <v-btn @click="axiosTest2">Error</v-btn>
+    </div>
+    <h1>Socket 테스트</h1>
+    <div>
+      <v-btn @click="joinRoom">룸 입장</v-btn>
+      <v-btn @click="leaveRoom">룸 퇴장</v-btn>
+      <v-btn @click="sendMsg1">전체 보내기</v-btn>
+      <v-btn @click="sendMsg2">전체 브로드캐스팅 보내기</v-btn>
+      <v-btn @click="sendMsg3">룸 보내기</v-btn>
+      <v-btn @click="sendMsg4">룸 브로드캐스팅 보내기</v-btn>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: "Home",
-	data() {
-		return {
-			title : "My App",
-		}
-	},
-	title() {
-		return this.title;
-	},
-	
+  data() {
+    return {
+      title: "My App",
+    };
+  },
+  title() {
+    return this.title;
+  },
+  mounted() {
+    this.$socket.on("room:testmsg", (data) => {
+      console.log("room:testmsg", data);
+    });
+  },
+  destroyed() {
+    this.$socket.off("room:testmsg");
+  },
   methods: {
     toastTest1() {
       this.$toast.info("Hello Info");
@@ -83,14 +99,46 @@ export default {
       );
       console.log(res);
     },
-		async axiosTest1() {
-			const result = await this.$axios.get('/api/member/test');
-			console.log(result);
-		},
-		async axiosTest2() {
-			const result = await this.$axios.get('/api/error');
-			console.log(result);
-		},
+    async axiosTest1() {
+      const result = await this.$axios.get("/api/member/test");
+      console.log(result);
+    },
+    async axiosTest2() {
+      const result = await this.$axios.get("/api/error");
+      console.log(result);
+    },
+    joinRoom() {
+      this.$socket.emit("room:join", "testroom");
+      console.log("test room 입장");
+    },
+    leaveRoom() {
+      this.$socket.emit("room:leave", "testroom");
+      console.log("test room 퇴장");
+    },
+    sendMsg1() {
+      this.$socket.emit("room:msg", {
+        msg: "접속된 모든 소켓에 메시지를 보냅니다.",
+        target: 1,
+      });
+    },
+    sendMsg2() {
+      this.$socket.emit("room:msg", {
+        msg: "나를 제외한 모든 소켓에 메세지를 보냅니다.",
+        target: 2,
+      });
+    },
+    sendMsg3() {
+      this.$socket.emit("room:msg", {
+        msg: "룸에 입장한 모든 소켓에 메세지를 보냅니다.",
+        target: 3,
+      });
+    },
+    sendMsg4() {
+      this.$socket.emit("room:msg", {
+        msg: "룸에 나를 제외한 소켓에 메세지를 보냅니다.",
+        target: 4,
+      });
+    },
   },
 };
 </script>

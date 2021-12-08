@@ -14,9 +14,8 @@ require('./plugins/pm2Bus');
 	const configModel = require('./api/_model/configModel');
 	await configModel.load();
 
-	setInterval(() => {
-		console.log($config.client.test1, $config.server.test1)
-	}, 5000);
+	const socket = require('./plugins/socket');
+	socket(webServer);
 
 	let isDiableKeepAlive = false;
 	app.use((req, res, next) => {
