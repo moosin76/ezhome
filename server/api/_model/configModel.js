@@ -95,6 +95,16 @@ const configModel = {
 		const [row] = await db.execute(sql.query, sql.values);
 		configModel.clearConfigItem(cf_key);
 		return row.affectedRows == 1;
+	},
+	async restart(req) {
+		if (!isGrant(req, LV.SUPER)) {
+			throw new Error('최고관리자만 서버를 재시작할 수 있습니다.');
+		}
+		process.send({
+			type: "config:restart",
+			data: "restart"
+		});
+		return true;
 	}
 };
 

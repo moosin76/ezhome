@@ -15,4 +15,12 @@ pm2.launchBus(function (err, pm2_bus) {
 		delete $config.client[data];
 		delete $config.server[data];
 	});
+
+	pm2_bus.on('config:restart', function (packet) {
+		console.log("Server restart!!!");
+		const exec = require('child_process').exec;
+		exec('pm2 reload all', (err) => {
+			console.log("Server restart msg", err);
+		})
+	})
 })

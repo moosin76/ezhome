@@ -7,6 +7,11 @@ router.get('/', async (req, res) => {
 	res.json(result);
 });
 
+router.get('/restart', async (req, res) => {
+	const result = await modelCall(configModel.restart, req);
+	res.json(result);
+})
+
 router.get('/duplicateCheck', async (req, res) => {
 	const result = await modelCall(configModel.duplicateCheck, req.query);
 	res.json(result);
@@ -17,12 +22,12 @@ router.post('/', async (req, res) => {
 	res.json(result);
 });
 
-router.put('/', async (req, res)=> {
+router.put('/', async (req, res) => {
 	const result = await modelCall(configModel.sortUpdate, req);
 	res.json(result);
 })
 
-router.delete('/:cf_key', async(req, res)=>{
+router.delete('/:cf_key', async (req, res) => {
 	const result = await modelCall(configModel.removeConfig, req);
 	res.json(result);
 });

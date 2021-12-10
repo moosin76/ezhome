@@ -32,8 +32,16 @@ export default {
   name: "App",
   socket() {
     return {
+      connect: () => {
+        console.log("socket connect");
+        this.SET_ONLINE(true);
+      },
+      disconnect: () => {
+        console.log("socket disconnect");
+        this.SET_ONLINE(false);
+      },
       "config:update": (data) => {
-				console.log(data);
+        console.log(data);
         this.SET_CONFIG(data);
       },
       "config:remove": (key) => {
@@ -53,6 +61,7 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_CONFIG"]),
+    ...mapMutations("socket", ["SET_ONLINE"]),
     toggleDrawer() {
       this.drawer = !this.drawer;
     },
