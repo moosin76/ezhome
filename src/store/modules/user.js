@@ -24,12 +24,15 @@ export const getters = {
 	}
 };
 export const actions = {
-	async initUser({ commit }) {
+	async initUser({ commit, dispatch }) {
 		const { $axios } = Vue.prototype;
 		const data = await $axios.get('api/member/auth');
 		if (data) {
 			commit('SET_MEMBER', data.member);
 			commit('SET_TOKEN', data.token);
+			if (data.member) {
+				dispatch('socket/joinRoom', data.member.mb_id, { root: true });
+			}
 		}
 	},
 	async duplicateCheck(ctx, { field, value }) {
@@ -42,19 +45,26 @@ export const actions = {
 		const data = await $axios.post('/api/member', form);
 		return data;
 	},
-	async signInLocal({ commit }, form) {
+	async signInLocal({ commit, dispatch }, form) {
 		const { $axios } = Vue.prototype;
 		const data = await $axios.post('/api/member/loginLocal', form);
 		if (data) {
 			commit('SET_MEMBER', data.member);
 			commit('SET_TOKEN', data.token);
+			dispatch('socket/joinRoom', data.member.mb_id, { root: true });
 		}
 		return !!data;
 	},
-	async signOut({ commit, state }) {
+	async singInSocial({ commit, dispatch }, data) {
+		commit('SET_MEMBER', data.member);
+		commit('SET_TOKEN', data.token);
+		dispatch('socket/joinRoom', data.member.mb_id, { root: true });
+	},
+	async signOut({ commit, state, dispatch }) {
 		const { $axios } = Vue.prototype;
 		const mb_name = state.member.mb_name;
 		const data = await $axios.get('/api/member/signOut');
+		dispatch('socket/leaveRoom', state.member.mb_id, { root: true });
 		commit('SET_MEMBER', null);
 		commit('SET_TOKEN', null);
 		return mb_name;

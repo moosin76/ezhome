@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 });
 
 // 회원정보수정
-router.patch('/', async (req, res)=> {
+router.patch('/', async (req, res) => {
 	const result = await modelCall(memberModel.updateMember, req);
 	res.json(result);
 })
@@ -50,7 +50,6 @@ router.post('/loginLocal', async (req, res) => {
 router.get('/auth', (req, res) => {
 	const member = req.user;
 	const token = req.cookies.token;
-	// console.log('auth', member, token);
 	res.json({ member, token });
 });
 
@@ -80,16 +79,16 @@ router.patch('/modifyPassword', async (req, res) => {
 
 // 구글 로그인 요청
 router.get('/loginGoogle', passport.authenticate('google', {
-	scope:['email', 'profile']
+	scope: ['email', 'profile']
 }));
 // 카카오 로그인 요청
 router.get('/loginKakao', passport.authenticate('kakao'));
 // 네이버 로그인 요청
 router.get('/loginNaver', passport.authenticate('naver'));
 
-router.get('/social-callback/:provider', (req, res)=> {
+router.get('/social-callback/:provider', (req, res) => {
 	const provider = req.params.provider
-	passport.authenticate(provider, async function(err, member){
+	passport.authenticate(provider, async function (err, member) {
 		// console.log(member);
 		// res.json(member);
 		const result = await modelCall(memberModel.socialCallback, req, res, err, member);
@@ -98,7 +97,7 @@ router.get('/social-callback/:provider', (req, res)=> {
 })
 
 // 비밀번호 확인
-router.post('/checkPassword', async(req, res)=>{
+router.post('/checkPassword', async (req, res) => {
 	const result = await modelCall(memberModel.checkPassword, req);
 	res.json(result);
 })

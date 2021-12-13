@@ -55,8 +55,12 @@ export default {
     };
   },
   methods: {
-    ...mapActions("user", ["signInLocal", "findIdLocal", "findPwLocal"]),
-    ...mapMutations("user", ["SET_MEMBER", "SET_TOKEN"]),
+    ...mapActions("user", [
+      "signInLocal",
+      "findIdLocal",
+      "findPwLocal",
+      "singInSocial",
+    ]),
     async loginLocal(form) {
       this.isLoading = true;
       const data = await this.signInLocal(form);
@@ -114,8 +118,7 @@ export default {
       if (payload.err) {
         this.$toast.error(payload.err);
       } else {
-        this.SET_MEMBER(payload.member);
-        this.SET_TOKEN(payload.token);
+        this.singInSocial(payload);
         this.$router.push("/");
         this.$toast.info(
           `${this.$store.state.user.member.mb_name}님 환영합니다.`

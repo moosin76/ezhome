@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Server } = require('socket.io');
 const redisAdapter = require('socket.io-redis');
 const ConfigHandler = require('./ConfigHandler');
+const RoomHandler = require('./RoomHandler');
 
 const { REDIS_HOST, REDIS_PORT } = process.env;
 
@@ -11,21 +12,14 @@ module.exports = function (webServer) {
 
 	io.on('connection', (socket) => {
 		ConfigHandler(io, socket);
+		RoomHandler(io, socket);
 
 		console.log('a user connected' + socket.id);
-
 		socket.on('disconnect', () => {
 			console.log('disconnected' + socket.id);
 		});
 
-		socket.on('room:join', (roomName) => {
-			console.log('room join', roomName, socket.id)
-			socket.join(roomName);
-		});
-		socket.on('room:leave', (roomName) => {
-			console.log('room leave', roomName, socket.id)
-			socket.leave(roomName);
-		});
+
 		socket.on('room:msg', (data) => {
 			switch (data.target) {
 				case 1: // 전체 보내기 (나를 포함)
@@ -41,6 +35,12 @@ module.exports = function (webServer) {
 					socket.to('testroom').emit('room:testmsg', { msg: data.msg })
 					break;
 			}
+		});
+		socket.on('chat:test', (data) => {
+			const { toId, chatMsg, fromId } = data;
+			io.to(toId).emit('chat:test', {
+				fromId, chatMsg
+			})
 		})
 	});
 
