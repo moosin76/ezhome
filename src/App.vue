@@ -25,7 +25,7 @@ import SiteFooter from "./components/layout/SiteFooter.vue";
 import SiteTitle from "./components/layout/SiteTitle.vue";
 import SiteNavi from "./components/layout/SiteNavi.vue";
 import SiteUser from "./components/layout/SiteUser.vue";
-import { mapMutations } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 
 export default {
   components: { SiteTitle, SiteFooter, SiteNavi, SiteUser },
@@ -35,6 +35,7 @@ export default {
       connect: () => {
         console.log("socket connect");
         this.SET_ONLINE(true);
+				this.initRoom();
       },
       disconnect: () => {
         console.log("socket disconnect");
@@ -62,6 +63,7 @@ export default {
   methods: {
     ...mapMutations(["SET_CONFIG"]),
     ...mapMutations("socket", ["SET_ONLINE"]),
+    ...mapActions("socket", ["initRoom"]),
     toggleDrawer() {
       this.drawer = !this.drawer;
     },
