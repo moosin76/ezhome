@@ -83,7 +83,7 @@ export default {
         cf_comment: "",
         cf_client: 0,
       },
-      typeItems: ["String", "Number", "Json", "Secret"],
+      typeItems: ["String", "Number", "CheckBox", "Json", "Secret"],
     };
   },
   computed: {

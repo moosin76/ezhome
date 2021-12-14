@@ -18,6 +18,17 @@
       :hide-details="readonly"
     />
   </div>
+  <div v-else-if="fieldType == 'CheckBox'">
+    <v-checkbox
+      label="Check value"
+      :input-value="value"
+      @change="onInput"
+      :readonly="readonly"
+      :hide-details="readonly"
+      true-value="1"
+      false-value="0"
+    />
+  </div>
   <div v-else-if="fieldType == 'Json'">
     <template v-if="readonly">
       <v-btn @click="$refs.dialog.open()" color="primary">JSON 보기</v-btn>
