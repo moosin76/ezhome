@@ -32,10 +32,50 @@ const sqlHelper = {
 		return { query, values };
 	},
 	SelectLimit(table, options, cols = []) {
-
 		// 검색
 		let where = "";
-
+		let whereArr = [];
+		if (options.stf && options.stx && options.stc) {
+			for (let i in options.stf) {
+				const field = options.stf[i];
+				const text = options.stx[i];
+				const compare = options.stc[i];
+				if (field) {
+					switch (compare) {
+						case 'lt':
+							whereArr.push(` ${field}<'${text}' `);
+							break;
+						case 'lte':
+							whereArr.push(` ${field}<='${text}' `);
+							break;
+						case 'eq':
+							whereArr.push(` ${field}='${text}' `);
+							break;
+						case 'gte':
+							whereArr.push(` ${field}>='${text}' `);
+							break;
+						case 'gt':
+							whereArr.push(` ${field}>'${text}' `);
+							break;
+						case 'ne':
+							whereArr.push(` ${field}!='${text}' `);
+							break;
+						case 'null':
+							whereArr.push(` ${field} IS NULL `);
+							break;
+						case 'not':
+							whereArr.push(` ${field} IS NOT NULL `);
+							break;
+						default:
+							whereArr.push(` ${field} LIKE '%${text}%' `);
+							break;
+					}
+				}
+			}
+		}
+		if (whereArr.length) {
+			where = ` WHERE ` + whereArr.join(' AND ');
+		}
 		// 정렬
 		let order = "";
 		let orderArr = [];
