@@ -10,7 +10,7 @@ const sqlHelper = {
 				where.push(`${key}=?`);
 				values.push(data[key]);
 			}
-			if(where.length > 0) {
+			if (where.length > 0) {
 				query += ` WHERE ` + where.join(' AND ');
 			}
 		}
@@ -19,17 +19,59 @@ const sqlHelper = {
 			query = query.replace('*', cols.join(', '));
 		}
 
-		if(sort) {
+		if (sort) {
 			let sorts = [];
 			const keys = Object.keys(sort);
-			for(const key of keys) {
+			for (const key of keys) {
 				sorts.push(key + (sort[key] ? ' ASC ' : ' DESC '))
 			}
-			if(sorts.length ) {
+			if (sorts.length) {
 				query += ` ORDER BY ` + sorts.join(', ');
 			}
 		}
 		return { query, values };
+	},
+	SelectLimit(table, options, cols = []) {
+
+		// 검색
+		let where = "";
+
+		// 정렬
+		let order = "";
+		let orderArr = [];
+		if (options.sortBy && options.sortDesc) {
+			for (let i in options.sortBy) {
+				let sort = options.sortBy[i];
+				let desc = options.sortDesc[i];
+				if (typeof (desc) == 'boolean') {
+					sort += desc ? " ASC " : " DESC ";
+				} else {
+					sort += desc == 'true' ? " ASC " : " DESC ";
+				}
+				orderArr.push(sort);
+			}
+		}
+		if (orderArr.length) {
+			order = " ORDER BY " + orderArr.join(', ');
+		}
+
+		// 페이지 네이션
+		let limit = "";
+		if (options.page && options.itemsPerPage) {
+			const start = (options.page - 1) * options.itemsPerPage;
+			limit = ` limit ${start}, ${options.itemsPerPage}`
+		}
+
+		// 쿼리
+		let query = `SELECT * FROM ${table} ${where} ${order} ${limit}`;
+		if (cols.length) {
+			query = query.replace('*', cols.join(', '));
+		}
+
+		// 전체 아이템 개수
+		let countQuery = `SELECT COUNT(*) AS totalItems FROM ${table} ${where}`;
+
+		return { query, countQuery };
 	},
 	Insert(table, data) {
 		let query = `INSERT INTO ${table} ({1}) VALUES ({2})`;

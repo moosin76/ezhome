@@ -7,7 +7,7 @@ const sendMailer = require('../../plugins/sendMailer');
 
 const sqlHelper = require('../../../util/sqlHelper');
 const TABLE = require('../../../util/TABLE');
-const { LV } = require('../../../util/level');
+const { LV, isGrant } = require('../../../util/level');
 const moment = require('../../../util/moment');
 const { getIp } = require('../../../util/lib');
 
@@ -85,8 +85,8 @@ const memberModel = {
 
 		const payload = {
 			...req.body,
-			mb_update_at : at,
-			mb_update_ip : ip,
+			mb_update_at: at,
+			mb_update_ip: ip,
 		};
 
 		const admMode = payload.admMode;
@@ -97,7 +97,7 @@ const memberModel = {
 		delete payload.deleteImage;
 
 		// 비밀번호가 변경 해야 한다
-		if(payload.mb_password) {
+		if (payload.mb_password) {
 			payload.mb_password = jwt.generatePassword(payload.mb_password);
 		} else {
 			delete payload.mb_password;
@@ -112,36 +112,36 @@ const memberModel = {
 		const cachePath = `${MEMBER_PHOTO_PATH}/.cache`;
 
 		// 기존 이미지 삭제
-		if(deleteImage || (req.files && req.files.mb_image)) {
+		if (deleteImage || (req.files && req.files.mb_image)) {
 			payload.mb_photo = '';
 			try {
 				fs.unlinkSync(oldFile);
 				const cacheDir = fs.readdirSync(cachePath);
-				for(const p of cacheDir) {
-					if(p.startsWith(oldName)) {
+				for (const p of cacheDir) {
+					if (p.startsWith(oldName)) {
 						try {
 							fs.unlinkSync(`${cachePath}/${p}`);
-						} catch(e) {}
+						} catch (e) { }
 					}
 				}
-			} catch(e) {}
+			} catch (e) { }
 		}
 
 		// 이미지 업로드 되었으면 처리
-		if(req.files && req.files.mb_image) {
+		if (req.files && req.files.mb_image) {
 			const newName = jwt.getRandToken(16);
 			payload.mb_photo = `/upload/memberPhoto/${newName}.jpg`;
 			const newFile = `${MEMBER_PHOTO_PATH}/${newName}.jpg`;
-			req.files.mb_image.mv(newFile, (err)=>{
-				if(err) {
+			req.files.mb_image.mv(newFile, (err) => {
+				if (err) {
 					console.log('Member Photo 업로드 실패', err);
 				}
 			})
 		}
 
-		const sql = sqlHelper.Update(TABLE.MEMBER, payload, {mb_id});
+		const sql = sqlHelper.Update(TABLE.MEMBER, payload, { mb_id });
 		const [row] = await db.execute(sql.query, sql.values);
-		return await memberModel.getMemberBy({mb_id});
+		return await memberModel.getMemberBy({ mb_id });
 	},
 	async getMemberBy(form, cols = []) {
 		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, form, cols);
@@ -239,8 +239,8 @@ const memberModel = {
 	},
 	async loginSocial(req, data) {
 		let member = null;
-		const { id, provider, email, nickname, image }  = data;
-		
+		const { id, provider, email, nickname, image } = data;
+
 		try {
 			member = await memberModel.getMemberBy({ mb_email: email })
 		} catch (e) {
@@ -249,7 +249,7 @@ const memberModel = {
 			const data = {
 				mb_id: id,
 				mb_password: '',
-				mb_provider : provider,
+				mb_provider: provider,
 				mb_name: nickname,
 				mb_email: email,
 				mb_photo: image,
@@ -286,20 +286,33 @@ const memberModel = {
 		return html;
 	},
 	async checkPassword(req) {
-		if(!req.user) {
+		if (!req.user) {
 			throw new Error('로그인 되어 있지 않습니다.');
 		}
 		const data = {
-			mb_id : req.user.mb_id,
-			mb_password : await jwt.generatePassword(req.body.mb_password),
+			mb_id: req.user.mb_id,
+			mb_password: await jwt.generatePassword(req.body.mb_password),
 		};
 		const sql = sqlHelper.SelectSimple(TABLE.MEMBER, data, ['COUNT(*) AS cnt']);
-		const [[{cnt}]] = await db.execute(sql.query, sql.values);
-		if(cnt == 0) {
+		const [[{ cnt }]] = await db.execute(sql.query, sql.values);
+		if (cnt == 0) {
 			throw new Error('비밀번호가 올바르지 않습니다.');
 		} else {
 			return true;
 		}
+	},
+	async getMembers(req) {
+		if (!isGrant(req, LV.ADMIN)) {
+			throw new Error("회원 목록 권한이 없습니다.");
+		}
+		const options = req.query;
+		const sql = sqlHelper.SelectLimit(TABLE.MEMBER, options);
+		const [items] = await db.execute(sql.query);
+		const [[{ totalItems }]] = await db.execute(sql.countQuery);
+		items.forEach((item) => {
+			clearMemberField(item);
+		});
+		return { options, sql, items, totalItems };
 	}
 };
 

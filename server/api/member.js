@@ -4,6 +4,7 @@ const { modelCall } = require('../../util/lib');
 const passport = require('passport');
 const jwt = require('../plugins/jwt');
 
+
 // /api/member/duplicateCheck/mb_id/abcd
 // MVC 
 router.get('/duplicateCheck/:field/:value', async (req, res) => {
@@ -99,6 +100,11 @@ router.get('/social-callback/:provider', (req, res) => {
 // 비밀번호 확인
 router.post('/checkPassword', async (req, res) => {
 	const result = await modelCall(memberModel.checkPassword, req);
+	res.json(result);
+})
+
+router.get('/', async (req, res) => {
+	const result = await modelCall(memberModel.getMembers, req);
 	res.json(result);
 })
 module.exports = router;
