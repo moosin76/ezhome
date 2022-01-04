@@ -35,30 +35,37 @@ const sqlHelper = {
 		// 검색
 		let where = "";
 		let whereArr = [];
+		let values = [];
 		if (options.stf && options.stx && options.stc) {
 			for (let i in options.stf) {
 				const field = options.stf[i];
 				const text = options.stx[i];
 				const compare = options.stc[i];
-				if (field) {
+				if (field && text) {
 					switch (compare) {
 						case 'lt':
-							whereArr.push(` ${field}<'${text}' `);
+							whereArr.push(` ${field} < ?`);
+							values.push(text);
 							break;
 						case 'lte':
-							whereArr.push(` ${field}<='${text}' `);
+							whereArr.push(` ${field} <= ? `);
+							values.push(text);
 							break;
 						case 'eq':
-							whereArr.push(` ${field}='${text}' `);
+							whereArr.push(` ${field} = ? `);
+							values.push(text);
 							break;
 						case 'gte':
-							whereArr.push(` ${field}>='${text}' `);
+							whereArr.push(` ${field} >= ? `);
+							values.push(text);
 							break;
 						case 'gt':
-							whereArr.push(` ${field}>'${text}' `);
+							whereArr.push(` ${field} > ? `);
+							values.push(text);
 							break;
 						case 'ne':
-							whereArr.push(` ${field}!='${text}' `);
+							whereArr.push(` ${field} != ? `);
+							values.push(text);
 							break;
 						case 'null':
 							whereArr.push(` ${field} IS NULL `);
@@ -66,8 +73,9 @@ const sqlHelper = {
 						case 'not':
 							whereArr.push(` ${field} IS NOT NULL `);
 							break;
-						default:
-							whereArr.push(` ${field} LIKE '%${text}%' `);
+						case 'like':
+							whereArr.push(` ${field} LIKE ? `);
+							values.push(`%${text}%`);
 							break;
 					}
 				}
@@ -111,7 +119,7 @@ const sqlHelper = {
 		// 전체 아이템 개수
 		let countQuery = `SELECT COUNT(*) AS totalItems FROM ${table} ${where}`;
 
-		return { query, countQuery };
+		return { query, countQuery, values };
 	},
 	Insert(table, data) {
 		let query = `INSERT INTO ${table} ({1}) VALUES ({2})`;

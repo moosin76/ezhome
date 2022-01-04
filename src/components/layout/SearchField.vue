@@ -5,7 +5,7 @@
     </tooltip-btn>
 
     <tooltip-btn
-      v-if="!!stf"
+      v-if="!!options.stf[0]"
       label="검색 초기화"
       icon
       small
@@ -73,19 +73,9 @@ export default {
       type: Array,
       required: true,
     },
-    stf: {
+    options: {
       // search text field
-      type: String,
-      required: true,
-    },
-    stx: {
-      // search text
-      type: String,
-      required: true,
-    },
-    stc: {
-      // search 비교방식
-      type: String,
+      type: Object,
       required: true,
     },
   },
@@ -98,7 +88,7 @@ export default {
         stc: "",
       },
       compItems: [
-        { text: "포함", value: "" },
+        { text: "포함", value: "like" },
         { text: "작은", value: "lt" },
         { text: "작거나 같은", value: "lte" },
         { text: "같은", value: "eq" },
@@ -114,9 +104,9 @@ export default {
   computed: {
     rules: () => validateRules,
     searchLabel() {
-      const item = this.items.find((item) => item.value == this.stf);
+      const item = this.items.find((item) => item.value == this.options.stf[0]);
       if (item) {
-        return `${item.text} : ${this.stx}`;
+        return `${item.text} : ${this.options.stx[0]}`;
       } else {
         return this.label;
       }
@@ -139,9 +129,9 @@ export default {
   },
   methods: {
     open() {
-      this.form.stf = this.stf;
-      this.form.stx = this.stx;
-      this.form.stc = this.stc || "";
+      this.form.stf = this.options.stf[0] || this.items[0].value;
+      this.form.stc = this.options.stc[0] || "like";
+      this.form.stx = this.options.stx[0];
       if (this.$refs.form) {
         this.$refs.form.resetValidation();
       }
@@ -151,15 +141,25 @@ export default {
       this.$refs.form.validate();
       await this.$nextTick();
       if (!this.valid) return;
-      this.$emit("update:stf", this.form.stf);
-      this.$emit("update:stx", this.form.stx);
-      this.$emit("update:stc", this.form.stc);
+      const options = {
+        ...this.options,
+        page: 1,
+        stf: [this.form.stf],
+        stc: [this.form.stc],
+        stx: [this.form.stx],
+      };
+      this.$emit("update:options", options);
       this.$refs.dialog.close();
     },
     reset() {
-      this.$emit("update:stf", "");
-      this.$emit("update:stx", "");
-      this.$emit("update:stc", "");
+      const options = {
+        ...this.options,
+        page: 1,
+        stf: [""],
+        stc: [""],
+        stx: [""],
+      };
+      this.$emit("update:options", options);
       this.$refs.dialog.close();
     },
   },

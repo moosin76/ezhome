@@ -2,13 +2,7 @@
   <v-container fluid>
     <v-toolbar>
       <v-toolbar-title>회원 관리</v-toolbar-title>
-      <search-field
-        :items="searchItems"
-        :stf.sync="options.stf[0]"
-        :stx.sync="options.stx[0]"
-        :stc.sync="options.stc[0]"
-        class="ml-4"
-      />
+      <search-field :items="searchItems" :options.sync="options" class="ml-4" />
     </v-toolbar>
     <v-data-table
       :headers="headers"
@@ -79,23 +73,6 @@ export default {
   watch: {
     options: {
       handler() {
-        if (!this.pageRouting) {
-          const opt = {
-            page: this.options.page,
-            itemsPerPage: this.options.itemsPerPage,
-            sortBy: this.options.sortBy[0],
-            sortDesc: this.options.sortDesc[0],
-            stf: this.options.stf[0] || undefined,
-            stx: this.options.stx[0] || undefined,
-            stc: this.options.stc[0] || undefined,
-          };
-          const query = qs.stringify(opt);
-          if (this.pageReady) {
-            history.pushState(null, null, `${this.$route.path}?${query}`);
-          } else {
-            history.replaceState(null, null, `${this.$route.path}?${query}`);
-          }
-        }
         this.fetchData();
       },
       deep: true,
@@ -140,6 +117,25 @@ export default {
       this.pageRouting = true;
       this.options = this.initOptions();
     },
+    pushState() {
+      if (!this.pageRouting) {
+        const opt = {
+          page: this.options.page,
+          itemsPerPage: this.options.itemsPerPage,
+          sortBy: this.options.sortBy[0],
+          sortDesc: this.options.sortDesc[0],
+          stf: this.options.stf[0] || undefined,
+          stx: this.options.stx[0] || undefined,
+          stc: this.options.stc[0] || undefined,
+        };
+        const query = qs.stringify(opt);
+        if (this.pageReady) {
+          history.pushState(null, null, `${this.$route.path}?${query}`);
+        } else {
+          history.replaceState(null, null, `${this.$route.path}?${query}`);
+        }
+      }
+    },
     async fetchData() {
       if (this.axiosSource) {
         this.axiosSource.cancel("fetch Data 취소");
@@ -153,6 +149,7 @@ export default {
         const data = await this.$axios.get(`/api/member?${query}`, {
           cancelToken: this.axiosSource.token,
         });
+        this.pushState();
         this.loading = false;
         this.pageReady = true;
         this.pageRouting = false;

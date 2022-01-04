@@ -307,8 +307,8 @@ const memberModel = {
 		}
 		const options = req.query;
 		const sql = sqlHelper.SelectLimit(TABLE.MEMBER, options);
-		const [items] = await db.execute(sql.query);
-		const [[{ totalItems }]] = await db.execute(sql.countQuery);
+		const [items] = await db.execute(sql.query, sql.values);
+		const [[{ totalItems }]] = await db.execute(sql.countQuery, sql.values);
 		items.forEach((item) => {
 			clearMemberField(item);
 		});
