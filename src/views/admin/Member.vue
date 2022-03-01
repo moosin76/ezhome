@@ -10,7 +10,30 @@
       :options.sync="options"
       :server-items-length="totalItems"
       :loading="loading"
-    ></v-data-table>
+    >
+      <template v-slot:item.cmd="{ item }">
+        <tooltip-btn icon label="수정" @click="openDialog(item)">
+          <v-icon>mdi-pencil</v-icon>
+        </tooltip-btn>
+      </template>
+    </v-data-table>
+
+    <ez-dialog
+      label="회원 수정"
+      ref="dialog"
+      width="500"
+      persistent
+      @onClose="closeDialog"
+    >
+      <user-update-form
+        v-if="curMember"
+        :member="curMember"
+        :isLoading="loading"
+        :admMode="true"
+        @onSave="saveMember"
+        @onLeave="leaveMember"
+      />
+    </ez-dialog>
   </v-container>
 </template>
 
@@ -18,9 +41,12 @@
 import qs from "qs";
 import SearchField from "../../components/layout/SearchField.vue";
 import axios from "axios";
+import TooltipBtn from "../../components/etc/TooltipBtn.vue";
+import EzDialog from "../../components/etc/EzDialog.vue";
+import UserUpdateForm from "../../components/auth/UserUpdateForm.vue";
 
 export default {
-  components: { SearchField },
+  components: { SearchField, TooltipBtn, EzDialog, UserUpdateForm },
   name: "AdmMember",
   data() {
     return {
@@ -68,6 +94,7 @@ export default {
       pageReady: false,
       pageRouting: false,
       axiosSource: null,
+      curMember: null,
     };
   },
   watch: {
@@ -160,6 +187,45 @@ export default {
       } catch (e) {
         // console.log("request 취소", e.message);
       }
+    },
+    openDialog(item) {
+      this.curMember = item;
+      this.$refs.dialog.open();
+    },
+    closeDialog() {
+      this.curMember = null;
+    },
+    async saveMember(form) {
+      this.loading = true;
+      const data = await this.$axios.patch("/api/member", form);
+      this.loading = false;
+      if (data) {
+        const idx = this.items.indexOf(this.curMember);
+        this.items.splice(idx, 1, data);
+        this.$toast.info(`${data.mb_name} 정보 수정하였습니다.`);
+        this.$refs.dialog.close();
+      }
+    },
+    async leaveMember() {
+      const result = await this.$ezNotify.confirm(
+        `${this.curMember.mb_name}님 탈퇴 처리 하시겠습니까?`,
+        "회원 탈퇴 처리",
+        { icon: "mdi-alert" }
+      );
+			if(!result) return;
+			this.loading = true;
+			const form = {
+				mb_id : this.curMember.mb_id,
+				mb_leave_at : this.$moment().format('LT'),
+			};
+			const data = await this.$axios.patch('/api/member', form);
+			this.loading = false;
+			if(data) {
+				this.$toast.info(`${this.curMember.mb_name}님 탈퇴 처리 하였습니다.`);
+				this.$refs.dialog.close();
+				this.pageRouting = true;
+				this.fetchData();
+			}
     },
   },
 };
